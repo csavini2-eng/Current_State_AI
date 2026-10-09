@@ -1,6 +1,6 @@
 # GoodBoy Training
 
-A mobile-first dog-training notebook where trainers define one consistent method and handlers can preview the same guidance for Raya.
+A trainer-facing dog-training website for managing Raya’s information, structured training paths, and consistent skill guidance.
 
 ## Run & Operate
 
@@ -26,24 +26,24 @@ A mobile-first dog-training notebook where trainers define one consistent method
 
 ## Architecture decisions
 
-- Keep this first prototype local to one browser: cross-device sharing, accounts, and backend sync are out of scope.
+- Keep this first prototype local to one browser: cross-device sharing, accounts, and backend sync are out of scope. The current experience is trainer-only.
 - Persist text and training progress locally; treat uploaded demonstration videos as temporary previews.
 - Seed milestones as illustrative and not started; trainers alone control status changes.
 - Keep the simulated skill example distinct from live AI behavior.
 
 ## Product
 
-Trainers can edit Raya’s profile, create or assign training paths, manage ordered skills and their status, enter precise cues and instructions, and preview those details in a read-only Handler View.
+Trainers can edit Raya’s profile, create or assign training paths, manage ordered skills and their status, and enter precise cues and instructions. Handler-facing screens are deferred.
 
 ## User preferences
 
-- Use a warm, photo-led editorial direction with cream, charcoal, and sage tones.
+- The user rejected the formal editorial appearance as depressing. Use brighter, friendly colors and approachable typography, with clear dog-information areas and a Duolingo-inspired connected training path.
 - Keep GoodBoy as the prototype’s working name while exploring alternatives.
 
 ## Gotchas
 
 - A selected video does not persist after refresh.
-- The handler screen is a same-browser preview, not an external share link.
+- This is currently a trainer-only website, not a native mobile app or an external handler-sharing system.
 
 ## Pointers
 

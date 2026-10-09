@@ -1,6 +1,6 @@
 # GoodBoy — shared dog training journey
 
-GoodBoy is a mobile-first training notebook that helps a trainer define a consistent method and lets handlers refer to the same cues and instructions for Raya.
+GoodBoy is a responsive trainer-facing website for managing Raya’s information, defining a consistent method, and organizing skills along a connected training journey.
 
 ## The problem
 
@@ -12,10 +12,10 @@ When several people train the same dog, cues and expectations can diverge, while
 2. Open a path to see its milestones and status.
 3. Add or edit a skill’s name, verbal command, hand signal, and practice instructions.
 4. Optionally choose a demonstration video for a temporary in-browser preview.
-5. Save the skill and open its read-only Handler View to see the same saved guidance.
+5. Save the skill and return to the connected training journey.
 6. The trainer can update the skill’s status in the journey.
 
-Profile, paths, skills, and status are saved in this browser’s local storage. The Handler View is an in-app preview; it does not synchronize to another device or share data with another person.
+Profile, paths, skills, and status are saved in this browser’s local storage. This version focuses only on trainers; handler-facing screens and cross-device sharing are deferred.
 
 ## Run and open the prototype
 
@@ -37,7 +37,7 @@ These interaction tests have **not been run yet**. The first-build check confirm
 
 | Case | Check | Recorded result |
 | --- | --- | --- |
-| Typical | Create a skill named “Retrieve” with the command “Fetch,” save it, then confirm it appears in the journey and Handler View. | Not run yet. |
+| Typical | Create a skill named “Retrieve” with the command “Fetch,” save it, then confirm it appears in the journey and can be reopened for editing. | Not run yet. |
 | Long text | Save a long skill name and multi-sentence instructions, then confirm they remain readable and persist after refresh. | Not run yet. |
 | Invalid | Try to save without a command or instructions and confirm the app blocks the save with a helpful message. | Not run yet. |
 
