@@ -1,0 +1,115 @@
+The application is looking much better! I would like to make a few improvements to the dog profiles, visual design, and training-path management while keeping the current visual identity.
+
+Please preserve the existing design style, typography, colors, and overall layout. Do not redesign the application from scratch.
+
+## 1. Dog Profiles
+
+I want to expand the dog profile functionality.
+
+- **Dog's age:** Display the dog's age on the profile. Ideally, allow the trainer to enter the dog's date of birth so the age can be calculated automatically.
+- **Dog photograph:** Remove the "Sample Portrait" label. Replace the current picture of Raya with a happier, friendlier photograph, preferably showing her looking at the camera with her tongue out. If you cannot use an appropriate image of Raya, allow me to upload a replacement rather than using an unrelated dog.
+- **Handler information:** Add the name of the dog's assigned handler to the profile. This should be editable.
+- **Multiple dogs:** Allow trainers to create, view, and edit multiple dog profiles. Add a simple "My Dogs" gallery where each dog has a photo, name, breed, and current training path.
+- Include a clear **"Add New Dog"** button.
+
+The user should be able to select a dog from the gallery and open its individual profile.
+
+Each dog should have its own assigned training paths and progress.
+
+## 2. Sharing Training Paths With Handlers
+
+Add an option to share a dog's assigned training path with their handler.
+
+On the dog profile and training-path screen, include a **"Share With Handler"** button.
+
+For this prototype:
+
+- Allow the trainer to enter or select a handler's name.
+- Generate a shareable, read-only preview of the dog's training path.
+- The handler should see the skills, verbal commands, hand signals, instructions, and available demonstration videos.
+- The handler should not be able to change the trainer's approved instructions.
+- Make the sharing experience simple and intuitive.
+
+##
+
+## 3. Milestone Gallery — Reusable Training Skills
+
+This is one of the most important new features.
+
+Create a dedicated **Milestone Gallery** where trainers can organize and reuse individual training skills.
+
+For example, the milestone "Sit" could be used in several different training paths without needing to recreate it each time.
+
+Each milestone should contain:
+
+- Milestone name
+- Short description or objective
+- Verbal command
+- Hand signal
+- Training instructions
+- Optional demonstration video
+- Category or difficulty level
+
+### Milestone Gallery Functionality
+
+The trainer should be able to:
+
+- Browse available milestones.
+- Create a new milestone.
+- Edit an existing milestone.
+- Duplicate a milestone.
+- Search for milestones by name.
+- Select one or multiple milestones and add them to an existing training path.
+
+### Reusing Milestones
+
+Design the system so that milestones can be reused across multiple paths.
+
+For example:
+
+**Milestone Gallery**
+
+- Sit
+- Stay
+- Come
+- Heel
+- Retrieve
+
+**Foundation Skills Path**
+
+- Sit → Stay → Come
+
+**Public Access Training Path**
+
+- Heel → Stay → Come
+
+In this example, "Stay" and "Come" are reusable milestones belonging to both paths.
+
+For the prototype, use shared milestone templates, but preserve the ability to customize a milestone inside a particular training path without unintentionally changing other paths.
+
+For example, offer:
+
+- **Edit original milestone:** Updates the reusable template.
+- **Customize for this path:** Creates a path-specific version without modifying the original.
+
+Keep this interaction understandable and avoid unnecessary technical complexity.
+
+## 5. Navigation and User Experience
+
+Update the application's navigation so the following areas are easy to find:
+
+- **My Dogs:** Create, view, and edit dog profiles.
+- **Training Paths:** Browse, create, edit, and assign reusable training programs.
+- **Milestone Gallery:** Browse, create, edit, and reuse training skills.
+
+The relationship should be intuitive:
+
+**Milestones → Training Paths → Dogs → Handlers**
+
+A trainer creates milestones, combines them into training paths, assigns paths to dogs, and shares the relevant information with handlers.
+
+Maintain a friendly, clean, visual interface with a minimal number of steps.
+
+Use cards, illustrations, and visual progression where useful, but avoid overcrowding the screens.
+
+##
