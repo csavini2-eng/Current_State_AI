@@ -1,6 +1,6 @@
 # GoodBoy Training
 
-A trainer-facing dog-training website for managing Raya’s information, structured training paths, and consistent skill guidance.
+A trainer-facing dog-training website for managing multiple dogs, reusable milestone templates, structured training paths, and live read-only handler guides.
 
 ## Run & Operate
 
@@ -8,14 +8,15 @@ A trainer-facing dog-training website for managing Raya’s information, structu
 - `pnpm --filter @workspace/goodboy-training run typecheck` — typecheck the app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- The GoodBoy prototype does not require a database or secrets.
+- The API uses PostgreSQL, managed sign-in, and App Storage. Anonymous trainer records remain browser-local; sign-in enables private cloud records, persistent videos, and live sharing.
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
 - Frontend: React, Vite, TypeScript, Wouter
-- GoodBoy profile, path, skill, and status data: browser local storage
-- Video preview: browser object URL only; no persistent media storage
+- Signed-in dog profiles, paths, templates, and per-dog progress: PostgreSQL, scoped to the signed-in trainer
+- Anonymous prototype: browser local storage, with legacy Raya data preserved and migrated
+- Photographs and demonstration videos: App Storage, with authenticated uploads and access-checked serving
 
 ## Where things live
 
@@ -26,25 +27,28 @@ A trainer-facing dog-training website for managing Raya’s information, structu
 
 ## Architecture decisions
 
-- Keep this first prototype local to one browser: cross-device sharing, accounts, and backend sync are out of scope. The current experience is trainer-only.
-- Persist text and training progress locally; treat uploaded demonstration videos as temporary previews.
+- The trainer workspace is private; handlers open a live, read-only link for one assigned dog/path without signing in.
+- Milestones are reusable templates. Editing an original affects linked steps; customizing for one path stores an independent override on that path.
+- Progress belongs to a dog’s path assignment, keyed by path step, never to a global milestone template.
+- Workspace saves use revision checks to prevent stale tabs overwriting newer records. Anonymous records stay local until saved after sign-in.
 - Seed milestones as illustrative and not started; trainers alone control status changes.
 - Keep the simulated skill example distinct from live AI behavior.
 
 ## Product
 
-Trainers can edit Raya’s profile, create or assign training paths, manage ordered skills and their status, and enter precise cues and instructions. Handler-facing screens are deferred.
+Trainers manage dog profiles (including date of birth, calculated age, and assigned handler), combine reusable milestones into paths, assign paths to dogs, track each dog’s progress, and share live approved guidance with handlers.
 
 ## User preferences
 
 - The user rejected the formal editorial appearance as depressing. Use brighter, friendly colors and approachable typography, with clear dog-information areas and a Duolingo-inspired connected training path.
-- The user approved the brighter playful workspace. Use “Dogs” navigation with a profile directory; only Raya’s profile should be functional for now.
+- The user approved the current brighter playful workspace and explicitly requested preserving its typography, colors, style, and layout while extending functionality.
 - Keep GoodBoy as the prototype’s working name while exploring alternatives.
 
 ## Gotchas
 
-- A selected video does not persist after refresh.
-- This is currently a trainer-only website, not a native mobile app or an external handler-sharing system.
+- Anyone holding a handler link can read that specific dog/path; names label the intended handler but do not authenticate their identity. Trainers can revoke links.
+- Anonymous photograph uploads are local; persistent videos and live sharing require sign-in. Imported photographs are moved to App Storage before cloud save.
+- Do not substitute an unrelated dog for Raya or invent her birthday. Keep her current photograph until the trainer uploads a replacement.
 
 ## Pointers
 
