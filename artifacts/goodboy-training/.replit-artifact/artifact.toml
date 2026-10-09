@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "GoodBoy Training"
+description = "A warm, mobile-first dog training journey app that helps trainers define a consistent method and lets handlers follow the same cues and instructions for Raya."
+version = "1.0.0"
+id = "artifacts/goodboy-training"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22351
+
+[services.development]
+run = "pnpm --filter @workspace/goodboy-training run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/goodboy-training", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/goodboy-training/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22351"
+BASE_PATH = "/"

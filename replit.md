@@ -1,45 +1,51 @@
-# [Project name]
+# GoodBoy Training
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A mobile-first dog-training notebook where trainers define one consistent method and handlers can preview the same guidance for Raya.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- Open the **GoodBoy Training** web preview; its managed workflow runs the frontend.
+- `pnpm --filter @workspace/goodboy-training run typecheck` — typecheck the app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- The GoodBoy prototype does not require a database or secrets.
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: React, Vite, TypeScript, Wouter
+- GoodBoy profile, path, skill, and status data: browser local storage
+- Video preview: browser object URL only; no persistent media storage
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/goodboy-training/src/App.tsx` — profile, paths, journeys, skill editor, and handler view
+- `artifacts/goodboy-training/src/index.css` — app visual system and responsive styling
+- `artifacts/goodboy-training/src/assets/raya-sample.jpg` — replaceable generated sample portrait
+- `artifacts/api-server/` and `lib/` — shared workspace scaffolding; not used by GoodBoy’s local-only data flow
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Keep this first prototype local to one browser: cross-device sharing, accounts, and backend sync are out of scope.
+- Persist text and training progress locally; treat uploaded demonstration videos as temporary previews.
+- Seed milestones as illustrative and not started; trainers alone control status changes.
+- Keep the simulated skill example distinct from live AI behavior.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Trainers can edit Raya’s profile, create or assign training paths, manage ordered skills and their status, enter precise cues and instructions, and preview those details in a read-only Handler View.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Use a warm, photo-led editorial direction with cream, charcoal, and sage tones.
+- Keep GoodBoy as the prototype’s working name while exploring alternatives.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- A selected video does not persist after refresh.
+- The handler screen is a same-browser preview, not an external share link.
 
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See `README.md` for the product flow, simulated AI boundaries, known limitations, and pending interaction-test cases

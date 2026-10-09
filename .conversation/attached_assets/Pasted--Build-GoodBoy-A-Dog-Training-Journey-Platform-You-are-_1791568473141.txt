@@ -1,0 +1,433 @@
+# Build GoodBoy — A Dog Training Journey Platform
+
+You are an expert product designer, UX/UI designer, and full-stack developer. Your task is to create a beautiful, intuitive, mobile-first web application called **GoodBoy**.
+
+This is an early-stage startup prototype being developed for an entrepreneurship and AI course at the University of Notre Dame.
+
+The goal is to build a working, visually compelling prototype that demonstrates the product's value without unnecessary technical complexity.
+
+**Important: Prioritize quality over quantity. Build a small number of excellent, functional screens rather than many incomplete ones.**
+
+## 1. Product Vision
+
+**GoodBoy — One dog. One training path. Everyone follows the same method.**
+
+GoodBoy is a shared training platform for professional working-dog trainers, handlers, and caregivers.
+
+The problem:
+
+When multiple people train the same dog, they may use different verbal commands, hand signals, techniques, or expectations. This inconsistency can confuse the dog and slow its progress.
+
+Important training information may also be scattered across text messages, videos, notebooks, and personal conversations.
+
+GoodBoy solves this problem by giving every dog a digital profile connected to structured training paths.
+
+A professional trainer can create a training path, define the correct commands and methods, and share this knowledge with everyone involved in the dog's development.
+
+The long-term vision is to create a **living training passport** that follows the dog throughout its training journey.
+
+The platform should eventually support service dogs, police dogs, detection dogs, and other working dogs.
+
+For this prototype, focus on one service dog in training.
+
+## 2. Primary Users
+
+There are two user perspectives.
+
+**Trainer — Primary user**
+
+The trainer creates and edits dog profiles, builds training paths, defines skills and commands, adds instructions, and uploads demonstration videos.
+
+**Handler or caregiver — Secondary user**
+
+The handler opens a dog's training path and sees exactly how a skill should be practiced.
+
+For this prototype, simulate both perspectives without building authentication or complicated permissions.
+
+The trainer should always have control over the training method and progression.
+
+## 3. Visual Identity and Design Direction
+
+The visual design is extremely important.
+
+I want an application with a recognizable, memorable identity, not a generic SaaS dashboard.
+
+Use the provided reference images as the main visual inspiration, particularly the latest simplified GoodBoy screens and the original editorial-style dog-training app reference.
+
+### Design personality
+
+- Warm, friendly, modern, and professional.
+- Playful without feeling childish.
+- Premium but approachable.
+- Minimalistic, with generous whitespace.
+- A balance of editorial typography and charming visual details.
+- Focus on the dog and the learning journey rather than technical dashboards.
+
+### Color palette
+
+Use a soft, sophisticated color system:
+
+- Warm ivory or cream for the main background.
+- Dark charcoal or espresso for text and main buttons.
+- Muted sage/olive green for progress.
+- Soft peach and dusty pink for secondary accents.
+- Warm butter yellow for selected milestones.
+- Very subtle muted blue-green for selected skill categories.
+
+Avoid bright orange-and-navy combinations, excessive gradients, and too many competing colors.
+
+### Typography
+
+Use a distinctive, rounded editorial serif or display typeface for major headings and branding, paired with a highly readable modern sans-serif for smaller text, form fields, and navigation.
+
+Typography should establish a clear hierarchy.
+
+### Components
+
+- Large, elegant dog photography.
+- Subtle organic background shapes.
+- Rounded, softly colored cards.
+- Simple and consistent line icons.
+- Large, comfortable touch targets.
+- Minimal navigation.
+- Small, restrained illustrations where appropriate.
+- Clear primary calls to action.
+
+Use playful decorative details sparingly. Avoid excessive hearts, paw prints, badges, statistics, or decorative graphics.
+
+### General rules
+
+Do not create a conventional corporate dashboard.
+
+Do not overload screens with information.
+
+Do not copy Duolingo's visual identity. Borrow only the idea of an intuitive, structured training progression.
+
+Design mobile-first, but make the interface responsive on desktop.
+
+## 4. Sample Dog: Raya
+
+Use the attached dog photo as the reference and profile image for Raya.
+
+Sample profile:
+
+- Name: Raya
+- Breed: Newfoundland (editable)
+- Training type: Service dog in training
+- Training status: Active
+- Current path: Foundation Skills
+
+Do not invent Raya's age, completed sessions, certifications, or real training achievements.
+
+Use clearly labeled sample data wherever necessary.
+
+### Dog Profile Functionality
+
+The trainer should be able to:
+
+1. View Raya's profile.
+2. Edit her name, breed, and training type.
+3. Change or upload her profile photo.
+4. See her assigned training path.
+5. Navigate to her training journey.
+
+Allow changes to be saved locally in the browser.
+
+The dog profile should feel like a personalized home page, featuring a beautiful image of Raya and one clear training-path card.
+
+## 5. Training Paths
+
+A training path is a structured sequence of skills created by a trainer.
+
+A path can be reused for different dogs in the future, but the current prototype only needs Raya.
+
+### Training Path Overview
+
+Display a simple page where trainers can:
+
+- View existing training paths.
+- Select an existing path.
+- Create a new path.
+- Edit a path's name and description.
+- Add skills to a path.
+- Edit existing skills.
+- Assign a selected path to Raya.
+
+Do not build an extensive template marketplace or large training library.
+
+Provide one sample path called **Foundation Skills**.
+
+Example milestones:
+
+1. Sit
+2. Stay
+3. Retrieve
+4. Come
+5. Heel
+
+These are illustrative skills, not claims about Raya's actual training achievements.
+
+### Path Creation
+
+When the user selects "Create New Path," open a clean form with:
+
+- Path name
+- Short description or goal
+
+Once saved, display the new path in the path list.
+
+The user should be able to open it and add skills.
+
+### Training Journey Visualization
+
+Use a Duolingo-inspired progression.
+
+However, keep it clean and mature rather than heavily gamified.
+
+Each milestone should be presented as a circular or softly rounded step connected to the next one.
+
+The user should be able to tap a milestone and open its details.
+
+Use subtle colors to distinguish:
+
+- Completed
+- In progress
+- Not started
+
+Only the trainer can change a skill's completion status. No automatic certification or AI-controlled advancement.
+
+Use simple transitions and subtle microinteractions.
+
+The training path should be one of the application's most recognizable design elements.
+
+## 6. Skill Creation and Editing
+
+This is one of the most important functional parts of the prototype.
+
+When a trainer selects "Add Skill" or edits an existing skill, display a clean form.
+
+Required fields:
+
+**Skill name**
+
+Example: Retrieve
+
+**Verbal command**
+
+Example: Fetch
+
+**Hand signal**
+
+A short description of the hand gesture or nonverbal cue.
+
+**Training instructions**
+
+A text field where the trainer explains how to practice the skill.
+
+**Demonstration video**
+
+Allow the trainer to select a video file from their device and preview it inside the skill.
+
+For the prototype, a browser-based video preview is sufficient. Do not build permanent media storage or an external video service.
+
+After saving, the skill must appear in the appropriate position in the training path.
+
+The trainer should be able to reopen and edit the skill.
+
+Validation should prevent saving a skill without a name, command, or instructions.
+
+## 7. Handler Preview
+
+This is the feature that demonstrates GoodBoy's central value.
+
+After creating or editing a skill, the trainer should be able to select:
+
+**Preview as Handler**
+
+The application should display a simplified read-only version of that skill, showing:
+
+- Skill name
+- Verbal command
+- Hand signal
+- Training instructions
+- Demonstration video, if attached
+
+The handler view must use the same information the trainer entered.
+
+This is critical: the prototype should demonstrate how two people can follow one consistent training method.
+
+Include a button that returns to the trainer's view.
+
+No real invitations, accounts, or multi-user synchronization are needed for this milestone.
+
+## 8. AI Functionality — Simulated for This Milestone
+
+AI is part of the product vision, but a live AI model is not required for this class prototype.
+
+In the future, GoodBoy's AI assistant will:
+
+- Convert a trainer's written training objectives into suggested skill structures.
+- Help organize milestones within a training journey.
+- Summarize training-session observations from multiple handlers.
+- Identify possible inconsistencies between commands or methods.
+- Suggest areas requiring trainer attention.
+
+The trainer must always review AI suggestions and retain final authority over training decisions.
+
+### Implement one small AI simulation
+
+On the skill creation form, include an optional button:
+
+**✨ AI Assist — Example**
+
+Clicking the button should insert a predefined example skill, such as Retrieve, including a sample verbal cue, hand signal, and instructions.
+
+The trainer can edit everything before saving.
+
+Clearly label this behavior as:
+
+"Simulated AI example — no live AI model is connected."
+
+Do not present hard-coded content as real AI generation.
+
+Do not connect an external model or require an API key.
+
+## 9. Required Working User Flow
+
+The main experience should be:
+
+1. Open GoodBoy.
+2. See Raya's profile.
+3. Open Training Paths.
+4. Choose an existing path or create a new one.
+5. Open the path.
+6. Add or edit a skill.
+7. Enter a verbal cue, hand signal, and instructions.
+8. Optionally select a demonstration video.
+9. Save the skill.
+10. See the skill in the training journey.
+11. Open "Preview as Handler."
+12. See the exact training instructions entered by the trainer.
+
+The flow must work from beginning to end.
+
+There should be no dead ends or buttons that do nothing.
+
+## 10. Technical Requirements
+
+Build a responsive web prototype using React and simple CSS or Tailwind CSS.
+
+Use reusable components and a straightforward project structure.
+
+Prefer simplicity over a complicated architecture.
+
+For this version:
+
+- No authentication.
+- No payments.
+- No external database.
+- No backend required.
+- No real AI API.
+- No marketplace.
+- No certification feature.
+- No production video hosting.
+- No external sharing system.
+
+Save text-based profile, path, and skill data using browser local storage.
+
+Handle video files as temporary browser previews and clearly explain that they do not persist after refresh.
+
+The application should work in Replit's preview and on a public deployment link.
+
+Include empty states, basic validation, and simple error messages.
+
+Avoid adding extra libraries unless they materially improve the result.
+
+## 11. Screens to Design
+
+Create four primary views:
+
+**Screen 1 — Raya's Profile**
+
+Hero dog photo, editable profile information, and her current training path.
+
+**Screen 2 — Training Paths**
+
+List of available paths with actions to open, create, and edit a path.
+
+**Screen 3 — Training Journey**
+
+A beautiful milestone progression showing the skills within the selected path.
+
+**Screen 4 — Skill Details**
+
+Editable instructions, verbal cue, hand signal, video upload, and handler preview.
+
+The handler preview may reuse the skill details screen in read-only mode rather than requiring a fifth independent screen.
+
+Keep navigation simple and intuitive.
+
+## 12. Testing
+
+The prototype must support these three tests:
+
+**Typical case:** Create a skill named Retrieve, enter the cue Fetch and complete instructions, save it, and verify it appears in the path and handler preview.
+
+**Challenge case:** Create a skill with a long name and multi-sentence instructions. Verify the layout remains readable and the text is preserved.
+
+**Invalid case:** Attempt to save a skill without a command or instructions. Verify the app shows a helpful error and prevents saving.
+
+Document the actual results after running the tests. Do not invent passing results.
+
+## 13. README Documentation
+
+Create or update README.md with:
+
+- Product name and one-sentence description.
+- The problem being solved.
+- The main working flow.
+- Instructions for running and opening the prototype.
+- Intended future AI functionality.
+- What AI behavior is simulated.
+- Three test cases with recorded results.
+- Two or three known limitations.
+
+Clearly distinguish fully working, simulated, and future capabilities.
+
+Do not include passwords, tokens, or API keys.
+
+## 14. Development Process
+
+Work in this order:
+
+1. Establish the visual identity and component styles.
+2. Build Raya's profile and the training-path overview.
+3. Implement creation and editing of training paths.
+4. Implement skill creation and editing.
+5. Implement the video preview.
+6. Implement the read-only handler view.
+7. Add the simulated AI example.
+8. Verify the end-to-end experience.
+9. Document tests and limitations.
+
+**Important:** Before implementing additional functionality beyond this scope, ask for approval.
+
+First show the proposed component structure and screen plan.
+
+Then implement the smallest working experience.
+
+Do not spend time creating unnecessary pages, authentication systems, dashboards, or features outside this brief.
+
+## Final Quality Standard
+
+The finished prototype should feel like an early version of a thoughtfully designed consumer app, not a generic admin dashboard.
+
+The dog should remain the emotional center of the experience.
+
+The visual identity should be consistent across screens.
+
+Every screen should have a clear purpose and one obvious primary action.
+
+The prototype should demonstrate that a trainer can define a training method and another handler can understand and follow it consistently.
+
+**Remember: One dog. One shared training journey. One consistent method.**
