@@ -1,0 +1,1 @@
+- [Live-link revocation](live-link-revocation.md) — revoked responses override cached guides; sharing controls must recover persisted links after navigation.

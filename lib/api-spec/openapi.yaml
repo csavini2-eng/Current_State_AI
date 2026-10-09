@@ -24,6 +24,100 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /training/workspace:
+    get:
+      operationId: getTrainingWorkspace
+      responses:
+        "200":
+          description: Trainer workspace
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceResponse" }
+    put:
+      operationId: saveTrainingWorkspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WorkspaceInput" }
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceResponse" }
+        "409": { description: Another tab saved a newer revision }
+  /training/shares:
+    get:
+      operationId: getHandlerShares
+      responses:
+        "200":
+          description: Active handler links owned by the trainer
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/HandlerShare" }
+    post:
+      operationId: createHandlerShare
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/HandlerShareInput" }
+      responses:
+        "200":
+          description: Live read-only share link
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HandlerShare" }
+  /training/shares/{id}:
+    delete:
+      operationId: revokeHandlerShare
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "204": { description: Link revoked }
+  /training/handler/{id}:
+    get:
+      operationId: getHandlerPath
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Latest approved path, read only
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HandlerPath" }
+        "404": { description: Missing or revoked link }
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadInput" }
+      responses:
+        "200":
+          description: Direct upload ticket
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UploadTicket" }
+  /storage/uploads/confirm:
+    post:
+      operationId: confirmUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MediaInput" }
+      responses:
+        "200":
+          description: Validated permanent media
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MediaResult" }
 components:
   schemas:
     HealthStatus:
@@ -33,4 +127,160 @@ components:
           type: string
       required:
         - status
+    MilestoneContent:
+      type: object
+      required: [name, description, command, handSignal, instructions, category, difficulty, videoPath]
+      properties:
+        name: { type: string, maxLength: 150 }
+        description: { type: string, maxLength: 1000 }
+        command: { type: string, maxLength: 500 }
+        handSignal: { type: string, maxLength: 2000 }
+        instructions: { type: string, maxLength: 12000 }
+        category: { type: string, maxLength: 100 }
+        difficulty: { type: string, enum: [Beginner, Intermediate, Advanced] }
+        videoPath: { type: string, maxLength: 500 }
+    MilestoneTemplate:
+      allOf:
+        - $ref: "#/components/schemas/MilestoneContent"
+        - type: object
+          required: [id]
+          properties:
+            id: { type: string, minLength: 1, maxLength: 100 }
+    PathStep:
+      type: object
+      required: [id, templateId, customization]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        templateId: { type: string, minLength: 1, maxLength: 100 }
+        customization:
+          anyOf:
+            - $ref: "#/components/schemas/MilestoneContent"
+            - type: "null"
+    TrainingProgram:
+      type: object
+      required: [id, name, description, steps]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        name: { type: string, minLength: 1, maxLength: 150 }
+        description: { type: string, maxLength: 2000 }
+        steps:
+          type: array
+          maxItems: 200
+          items: { $ref: "#/components/schemas/PathStep" }
+    DogProfile:
+      type: object
+      required: [id, name, breed, trainingType, birthDate, handlerName, photo]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        name: { type: string, minLength: 1, maxLength: 150 }
+        breed: { type: string, maxLength: 150 }
+        trainingType: { type: string, maxLength: 150 }
+        birthDate: { type: string, maxLength: 10 }
+        handlerName: { type: string, maxLength: 150 }
+        photo: { type: string, maxLength: 500 }
+    DogAssignment:
+      type: object
+      required: [id, dogId, pathId, progress]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        dogId: { type: string, minLength: 1, maxLength: 100 }
+        pathId: { type: string, minLength: 1, maxLength: 100 }
+        progress:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [not-started, in-progress, completed]
+    TrainingWorkspace:
+      type: object
+      required: [version, dogs, paths, milestones, assignments]
+      properties:
+        version: { type: integer, enum: [2] }
+        dogs:
+          type: array
+          maxItems: 300
+          items: { $ref: "#/components/schemas/DogProfile" }
+        paths:
+          type: array
+          maxItems: 300
+          items: { $ref: "#/components/schemas/TrainingProgram" }
+        milestones:
+          type: array
+          maxItems: 1000
+          items: { $ref: "#/components/schemas/MilestoneTemplate" }
+        assignments:
+          type: array
+          maxItems: 1000
+          items: { $ref: "#/components/schemas/DogAssignment" }
+    WorkspaceInput:
+      type: object
+      required: [state, revision]
+      properties:
+        state: { $ref: "#/components/schemas/TrainingWorkspace" }
+        revision: { type: integer, minimum: 0 }
+    WorkspaceResponse:
+      type: object
+      required: [state, revision, updatedAt]
+      properties:
+        state:
+          anyOf:
+            - $ref: "#/components/schemas/TrainingWorkspace"
+            - type: "null"
+        revision: { type: integer }
+        updatedAt: { type: ["string", "null"] }
+    HandlerShareInput:
+      type: object
+      required: [assignmentId, handlerName]
+      properties:
+        assignmentId: { type: string, minLength: 1, maxLength: 100 }
+        handlerName: { type: string, minLength: 1, maxLength: 150 }
+    HandlerShare:
+      type: object
+      required: [id, assignmentId, handlerName]
+      properties:
+        id: { type: string }
+        assignmentId: { type: string }
+        handlerName: { type: string }
+    HandlerMilestone:
+      allOf:
+        - $ref: "#/components/schemas/MilestoneContent"
+        - type: object
+          required: [id, status]
+          properties:
+            id: { type: string }
+            status: { type: string, enum: [not-started, in-progress, completed] }
+    HandlerPath:
+      type: object
+      required: [dog, pathName, pathDescription, handlerName, milestones, updatedAt]
+      properties:
+        dog: { $ref: "#/components/schemas/DogProfile" }
+        pathName: { type: string }
+        pathDescription: { type: string }
+        handlerName: { type: string }
+        milestones:
+          type: array
+          items: { $ref: "#/components/schemas/HandlerMilestone" }
+        updatedAt: { type: string }
+    UploadInput:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, maxLength: 250 }
+        size: { type: integer, minimum: 1, maximum: 52428800 }
+        contentType: { type: string, enum: [image/jpeg, image/png, image/webp, video/mp4, video/webm, video/quicktime] }
+    UploadTicket:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string }
+        objectPath: { type: string }
+    MediaInput:
+      type: object
+      required: [objectPath]
+      properties:
+        objectPath: { type: string, maxLength: 200 }
+    MediaResult:
+      type: object
+      required: [objectPath]
+      properties:
+        objectPath: { type: string }
 
