@@ -149,6 +149,12 @@ h1,h2,h3,.brand-name,.stat b,.node span { font-family:'Fredoka',sans-serif; }
 .icon-btn:hover { color:var(--o); border-color:var(--o); transform:translateY(-1px); }
 .chip { display:inline-block; padding:5px 12px; border-radius:99px; background:var(--ol); color:var(--od); font-size:12px; font-weight:900; }
 .home-grid { display:grid; grid-template-columns:1.1fr 1fr; gap:22px; align-items:start; }
+.dogs-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),380px)); gap:22px; }
+.directory-card .photo-wrap { height:250px; }
+.directory-card .photo-wrap img { height:100%; width:100%; object-fit:cover; }
+.directory-breed { color:var(--mute); margin:0 0 12px; }
+.directory-progress { margin:22px 0; }
+.directory-progress h3 { margin:6px 0 12px; }
 .dog-card { padding:0; overflow:hidden; }
 .photo-wrap { position:relative; }
 .photo-wrap img { display:block; width:100%; height:340px; object-fit:cover; }

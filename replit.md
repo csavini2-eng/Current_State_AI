@@ -19,7 +19,7 @@ A trainer-facing dog-training website for managing Raya’s information, structu
 
 ## Where things live
 
-- `artifacts/goodboy-training/src/App.tsx` — profile, paths, journeys, skill editor, and handler view
+- `artifacts/goodboy-training/src/App.tsx` — dog directory, profile, paths, journeys, and skill editor
 - `artifacts/goodboy-training/src/index.css` — app visual system and responsive styling
 - `artifacts/goodboy-training/src/assets/raya-sample.jpg` — replaceable generated sample portrait
 - `artifacts/api-server/` and `lib/` — shared workspace scaffolding; not used by GoodBoy’s local-only data flow
@@ -38,6 +38,7 @@ Trainers can edit Raya’s profile, create or assign training paths, manage orde
 ## User preferences
 
 - The user rejected the formal editorial appearance as depressing. Use brighter, friendly colors and approachable typography, with clear dog-information areas and a Duolingo-inspired connected training path.
+- The user approved the brighter playful workspace. Use “Dogs” navigation with a profile directory; only Raya’s profile should be functional for now.
 - Keep GoodBoy as the prototype’s working name while exploring alternatives.
 
 ## Gotchas

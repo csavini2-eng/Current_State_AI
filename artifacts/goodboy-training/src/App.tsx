@@ -46,14 +46,14 @@ function StatusPill({ status }: { status: Status }) {
   return <span className={`pill pill-${status}`}><Icon size={12} /> {statusLabel[status]}</span>;
 }
 function Label({ children }: { children: ReactNode }) { return <span className="eyebrow">{children}</span>; }
-function Shell({ children, store }: { children: ReactNode; store: Store }) {
+function Shell({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const pathsActive = location.startsWith('/paths') || location.startsWith('/journey') || location.startsWith('/skill');
   return <div className="app">
     <aside className="side">
       <Link href="/" className="brand"><span className="brand-symbol"><PawPrint size={20} /></span><span className="brand-name">GoodBoy</span></Link>
       <nav className="side-nav" aria-label="Main navigation">
-        <Link href="/" className={location === '/' ? 'active' : ''}><Dog size={19} /> {store.profile.name}</Link>
+        <Link href="/dogs" className={location === '/' || location.startsWith('/dogs') ? 'active' : ''}><Dog size={19} /> Dogs</Link>
         <Link href="/paths" className={pathsActive ? 'active' : ''}><RouteIcon size={19} /> Training paths</Link>
       </nav>
       <span className="side-note">Trainer workspace</span>
@@ -80,6 +80,28 @@ function pathStats(store: Store, path?: TrainingPath) {
 }
 function ProgressBar({ done, total }: { done: number; total: number }) {
   return <div className="bar" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={done}><span style={{ width: total ? `${(done / total) * 100}%` : '0%' }} /></div>;
+}
+
+function DogsPage({ store }: { store: Store }) {
+  const profile = store.profile;
+  const path = store.paths.find((item) => item.id === profile.pathId);
+  const { skills, done } = pathStats(store, path);
+  return <main className="main page-enter">
+    <header className="top"><div><Label>Your training team</Label><h1>Dogs</h1><p className="lede">Meet your dogs and open their training profiles.</p></div><span className="chip">1 dog</span></header>
+    <div className="dogs-grid">
+      <article className="card dog-card directory-card">
+        <div className="photo-wrap"><img src={profile.photo} alt={`${profile.name}, ${profile.breed} portrait`} /><span className="photo-tag">{profile.photo === rayaPortrait ? 'Sample portrait' : 'Uploaded portrait'}</span></div>
+        <div className="dog-facts">
+          <h2>{profile.name}</h2><p className="directory-breed">{profile.breed}</p>
+          <span className="chip">{profile.trainingType}</span>
+          <div className="directory-progress"><Label>Training path</Label><h3>{path?.name || 'No path assigned'}</h3>
+            {path && <><ProgressBar done={done} total={skills.length} /><p className="hint">{done} of {skills.length} milestones completed</p></>}
+          </div>
+          <Link href="/dogs/raya" className="btn btn-big" aria-label={`View ${profile.name}'s profile`}>View profile <ArrowRight size={18} /></Link>
+        </div>
+      </article>
+    </div>
+  </main>;
 }
 
 function HomePage({ store, setStore, toast }: PageProps) {
@@ -120,6 +142,7 @@ function HomePage({ store, setStore, toast }: PageProps) {
   };
   const p = store.profile;
   return <main className="main page-enter">
+    <Link href="/dogs" className="back"><ArrowLeft size={15} /> All dogs</Link>
     <header className="top"><div><Label>Dog information</Label><h1>{p.name}’s workspace</h1></div>
       <button className="btn" onClick={() => { setDraft(p); setEditing(true); }}><Pencil size={16} /> Edit profile</button></header>
     <div className="home-grid">
@@ -343,8 +366,10 @@ function Router() {
   const [notice, setNotice] = useState('');
   const toast = (message: string) => { setNotice(message); window.setTimeout(() => setNotice(''), 2400); };
   const props = { store, setStore, toast };
-  return <RoutedErrorBoundary><Shell store={store}><Switch>
-    <Route path="/"><HomePage {...props} /></Route>
+  return <RoutedErrorBoundary><Shell><Switch>
+    <Route path="/"><DogsPage store={store} /></Route>
+    <Route path="/dogs"><DogsPage store={store} /></Route>
+    <Route path="/dogs/raya"><HomePage {...props} /></Route>
     <Route path="/paths"><PathsPage {...props} /></Route>
     <Route path="/journey/:pathId"><JourneyPage {...props} /></Route>
     <Route path="/skill/:skillId"><SkillPage {...props} /></Route>
