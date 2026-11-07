@@ -28,14 +28,18 @@ A trainer-facing dog-training demo for managing multiple dogs, reusable mileston
 
 ## Architecture decisions
 
-- The public demo has no account prompts, real-sharing controls, or persistent video-upload controls. Keep only the small demo notice explaining browser-local storage and data-clear risk.
+- The public demo has no account prompts, real-sharing controls, or cloud-upload controls. Local demonstration and practice video selection/playback remain visible without sign-in.
 - Existing private workspaces stay private; existing capability links still grant read-only access to one assigned dog/path.
-- Milestones are reusable templates. Editing an original affects linked steps; customizing for one path stores an independent override on that path.
+- Editing has three distinct scopes: gallery original, reusable-path customization, and dog-assigned snapshot. A dog’s journey defaults to editing only that dog’s assignment; never offer an ambiguous original-edit action there.
+- Snapshot currently resolved milestone content when assigning a path and when migrating older assignments. Preserve content, IDs, progress, and video references; reusable template/path changes must never silently overwrite existing dog snapshots.
+- Adding, removing, or reordering milestones in a dog’s journey affects only that assignment, not its source path or another dog.
 - Progress belongs to a dog’s path assignment, keyed by path step, never to a global milestone template.
 - Private workspace saves retain revision checks. Guest records keep their existing storage keys and are never reset or replaced during this update.
 - Seed milestones as illustrative and not started; trainers alone control status changes.
 - Use the description field as the completion objective. New Foundation samples use the user-supplied example objectives, clearly labeled for tailoring; existing blank objectives require explicit trainer review/save, never silent backfilling.
 - Instruction dialogs are read-only, keyboard accessible, Escape-dismissable, and restore focus. Neither viewing nor editing instructions changes progress.
+- Local video blobs belong in IndexedDB, never localStorage or database JSON. Demonstration references belong to their editing scope; practice references belong only to a dog-assigned milestone.
+- If local video persistence fails, show an explicit error and offer a temporary preview that does not change the saved reference. Never imply that selecting a practice recording analyzes it.
 - Do not invent hand signals or show fake sharing, upload, or AI-analysis confirmations.
 
 ## Product
@@ -51,7 +55,7 @@ In the guest demo trainers manage dog profiles, combine reusable milestones into
 ## Gotchas
 
 - Anyone holding a handler link can read that specific dog/path; names label the intended handler but do not authenticate their identity. Trainers can revoke links.
-- Guest photograph selection stays local. Persistent video and real-sharing controls are deferred from the current public demo; do not replace them with fake successes.
+- Guest photographs and local videos stay in this browser. Cloud video upload and real-sharing controls are deferred from the public demo; do not replace them with fake successes.
 - Do not substitute an unrelated dog for Raya or invent her birthday. Keep her current photograph until the trainer uploads a replacement.
 
 ## Pointers

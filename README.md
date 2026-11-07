@@ -8,7 +8,8 @@
 - Assign a training path (for example "Foundation Skills") to that dog.
 - Open the dog's journey and set each milestone to Not started, In progress, or Completed. A counter shows how many are completed.
 - Read each milestone’s completion objective and open **View instructions** for the trainer’s cue, optional hand signal, and practice instructions.
-- Edit the reusable original or customize a milestone for just one path. Reading or editing instructions never marks a milestone complete.
+- Edit reusable originals in the gallery, customize reusable paths in Training Paths, or edit a dog’s independent assigned version from its journey. Reading or editing instructions never marks a milestone complete.
+- Select separate demonstration and dog-practice videos, play them locally, and replace/remove each recording without affecting another dog.
 
 ## Open the prototype
 
@@ -16,7 +17,19 @@ Live app: https://good-boy-dog-training-platform.replit.app
 
 Open the preview and use **Add New Dog**. The public demo has no sign-in dependency or account prompts. Records stay in this browser, do not sync across devices, and may be lost when browser data is cleared. Existing guest storage keys and records are retained.
 
-Persistent video-upload and real-sharing controls are not part of this demo round. Existing private backend records, access-controlled media, and previously issued handler links remain protected; the demo never loads account workspaces.
+Local video selection and playback do not require sign-in. Video files are stored in this browser’s IndexedDB, not localStorage; only opaque references are saved with the records. They do not sync across devices. If browser video storage fails, an explicit temporary-preview option is available and does not change the saved recording.
+
+Cloud-upload and real-sharing controls are not part of this demo round. Existing private backend records, access-controlled media, and previously issued handler links remain protected; the demo never loads account workspaces or turns private videos into public files.
+
+## Editing scopes
+
+1. **Gallery milestone:** the reusable source, edited only in Milestone Gallery.
+2. **Reusable-path milestone:** that path’s customization, edited from Training Paths.
+3. **Dog-assigned milestone:** independent content copied when the path is assigned. Dog-journey actions change only that assignment, including its added steps, order, demonstration references, progress, and practice videos.
+
+Existing assignments without snapshots are migrated from their currently resolved content. IDs, progress, customizations, and video references are preserved; existing snapshots are never rebuilt from later template/path changes. The storage key and workspace version remain unchanged.
+
+Demonstration videos show the trainer’s reference method. Practice videos belong to a particular dog’s assigned milestone. Selecting a practice video does not analyze it; automated feedback is not implemented.
 
 Fresh Foundation Skills milestones have example completion objectives that trainers should tailor to each dog. Existing blank objectives are not backfilled: open the editor to review an offered example and save it explicitly. Existing cues, hand signals, instructions, and path customizations are not replaced.
 
@@ -39,7 +52,7 @@ These three tests were recorded before the current demo update; they are not a c
 ## Known limitations
 
 1. Demo records are browser-local, with no cross-device sync or automatic backup.
-2. There is no video analysis, persistent video upload, or real sharing control in the guest demo.
+2. There is no video analysis, cloud video upload, or real sharing control in the guest demo. Browser-stored videos may be lost if browser data is cleared or the browser removes local storage.
 3. Trainers must supply missing cues and practice instructions; the app does not invent them or enforce milestone order. Foundation Skills objectives and Raya are sample data.
 
 ## Local checks
@@ -50,7 +63,7 @@ pnpm --filter @workspace/goodboy-training run test
 PORT=22351 BASE_PATH=/ pnpm --filter @workspace/goodboy-training run build
 ```
 
-## Current demo verification
+## Previous instruction-dialog verification
 
 - Full workspace type checks passed; all 11 helper regression tests passed.
 - The production frontend build passed with authentication publishable-key variables unset. Vite still emits a nonblocking source-map warning for the existing tooltip component.
@@ -62,3 +75,12 @@ PORT=22351 BASE_PATH=/ pnpm --filter @workspace/goodboy-training run build
 - Guest request monitoring showed no private API requests or external authentication-service traffic. Unsigned private workspace and upload requests still returned HTTP 401. Backend authorization code was not changed.
 
 These current checks ran against the development preview, not the published production site.
+
+## Current scope and video verification
+
+- Workspace type checks pass; the production web build passes (the pre-existing tooltip sourcemap warning remains non-blocking).
+- All 16 model regression tests pass, including independent dog snapshots, additive migration, preserved IDs/progress/video references, and intentionally empty assignments.
+- One isolated browser pass verified Raya/Doug edits, gallery/path independence, dog-only additions, progress and URL selection after reload, and legacy-v2 snapshot migration.
+- Real browser-recorded WebM files played successfully before and after reload. Practice replacement/removal affected only the intended dog; other practice and demonstration clips remained playable.
+- The browser pass verified opaque references in localStorage, actual video Blobs in IndexedDB, explicit storage-failure/temporary-preview behavior, and mobile dialog scrolling plus Escape/focus restoration.
+- Unauthenticated private workspace and upload requests still return 401. No real user or production records were modified during verification. Signed-in cloud-media flows were not re-tested; no cloud-video upload feature was added.

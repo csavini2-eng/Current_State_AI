@@ -2,7 +2,7 @@ import { type FormEvent, useState } from 'react';
 import { Link, useLocation, useParams } from 'wouter';
 import { ArrowLeft, ArrowRight, Map, Pencil, Plus, Save, Trash2, Dog as DogIcon } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
-import { ageLabel, newId, type DogProfile } from '@/lib/training';
+import { ageLabel, createAssignment, newId, type DogProfile } from '@/lib/training';
 import { DogPhoto, Label, Loading, Modal, NotFoundCard, ProgressBar, UploadField, assignmentStats } from '@/components/shared';
 
 const today = () => new Date().toLocaleDateString('sv');
@@ -73,6 +73,7 @@ export function DogProfilePage() {
   const [, go] = useLocation();
   const [editing, setEditing] = useState(false);
   const [pick, setPick] = useState('');
+  const [assignError, setAssignError] = useState('');
   if (isLoading) return <Loading />;
   const dog = state.dogs.find((d) => d.id === dogId);
   if (!dog) return <NotFoundCard title="Dog not found" text="This dog may have been removed." href="/dogs" cta="Back to My Dogs" />;
@@ -81,7 +82,10 @@ export function DogProfilePage() {
   const busy = isSaving || isUploading;
   const assign = async () => {
     if (!pick || mine.some((a) => a.pathId === pick)) return;
-    if (await save({ ...state, assignments: [...state.assignments, { id: newId(), dogId: dog.id, pathId: pick, progress: {} }] })) setPick('');
+    let next;
+    try { next = createAssignment(state, dog.id, pick); } catch (e) { setAssignError(e instanceof Error ? e.message : 'The path could not be assigned.'); return; }
+    setAssignError('');
+    if (await save({ ...state, assignments: [...state.assignments, next] })) setPick('');
   };
   const unassign = async (id: string, name: string) => {
     if (!window.confirm(`Remove “${name}” from ${dog.name}? Its progress for this dog will be deleted.`)) return;
@@ -117,6 +121,7 @@ export function DogProfilePage() {
         {free.length > 0 ? <div className="actions-row"><select className="inline-select" aria-label="Path to assign" value={pick} onChange={(e) => setPick(e.target.value)}><option value="">Choose a path</option>{free.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>
           <button className="btn btn-quiet btn-small" disabled={!pick || busy} onClick={() => void assign()}><Plus size={15} /> Assign</button></div>
           : <p className="hint">{state.paths.length ? 'All paths are assigned.' : 'Create a path first.'} <Link href="/paths">Training Paths</Link></p>}
+        {assignError && <p className="error-text" role="alert">{assignError}</p>}
       </section>
     </div>
     {editing && <DogFormModal dog={dog} onClose={() => setEditing(false)} />}

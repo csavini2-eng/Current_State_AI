@@ -98,6 +98,22 @@ export interface DogProfile {
   photo: string;
 }
 
+export interface AssignedMilestone {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  templateId: string;
+  content: MilestoneContent;
+  /** @maxLength 500 */
+  practiceVideoPath: string;
+}
+
 export type DogAssignmentProgress = {[key: string]: 'not-started' | 'in-progress' | 'completed'};
 
 export interface DogAssignment {
@@ -116,6 +132,11 @@ export interface DogAssignment {
      * @maxLength 100
      */
   pathId: string;
+  /**
+     * Independent dog-assigned snapshots; omitted only in legacy records.
+     * @maxItems 200
+     */
+  milestones?: AssignedMilestone[];
   progress: DogAssignmentProgress;
 }
 
