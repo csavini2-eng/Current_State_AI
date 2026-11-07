@@ -1,7 +1,7 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useClerk } from '@clerk/react';
-import { CheckCircle2, Circle, Dog as DogIcon, Layers, LogIn, LogOut, PawPrint, Play, Route as RouteIcon, Trash2, Upload, X } from 'lucide-react';
+import * as Dialog from '@radix-ui/react-dialog';
+import { CheckCircle2, Circle, Dog as DogIcon, Layers, PawPrint, Play, Route as RouteIcon, Trash2, Upload, X } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
 import { mediaUrl, resolveStep, statusLabel, type DogProfile, type MilestoneContent, type MilestoneTemplate, type Status, type TrainingProgram, type TrainingWorkspace, type DogAssignment } from '@/lib/training';
 import rayaPortrait from '../assets/raya-sample.jpg';
@@ -36,16 +36,23 @@ export function assignmentStats(state: TrainingWorkspace, a: DogAssignment) {
 export function templateById(state: TrainingWorkspace, id: string): MilestoneTemplate | undefined { return state.milestones.find((m) => m.id === id); }
 
 export function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
-  return <div className="modal-back" role="dialog" aria-modal="true" aria-label={title}><div className={`card modal ${wide ? 'wide' : ''}`}>
-    <div className="form-top"><h2>{title}</h2><button type="button" className="icon-btn" aria-label="Close" onClick={onClose}><X size={18} /></button></div>
-    {children}
-  </div></div>;
+  const opener = useRef(document.activeElement instanceof HTMLElement ? document.activeElement : null);
+  return <Dialog.Root open onOpenChange={open => { if (!open) onClose(); }}><Dialog.Portal>
+    <Dialog.Overlay className="modal-back">
+      <Dialog.Content className={`card modal ${wide ? 'wide' : ''}`} aria-describedby={undefined}
+        onCloseAutoFocus={event => { event.preventDefault(); if (opener.current?.isConnected) opener.current.focus(); }}>
+        <div className="form-top"><Dialog.Title asChild><h2>{title}</h2></Dialog.Title><Dialog.Close asChild><button type="button" className="icon-btn" aria-label="Close"><X size={18} /></button></Dialog.Close></div>
+        {children}
+      </Dialog.Content>
+    </Dialog.Overlay>
+  </Dialog.Portal></Dialog.Root>;
 }
 
 export function UploadField({ id, label, kind, value, onChange }: { id: string; label: string; kind: 'image' | 'video'; value: string; onChange: (path: string) => void }) {
   const { upload, isUploading, isSaving, isSignedIn } = useWorkspace();
   const [err, setErr] = useState('');
   const locked = kind === 'video' && !isSignedIn;
+  if (locked) return null;
   const pick = async (file?: File) => {
     if (!file) return;
     setErr('');
@@ -57,21 +64,19 @@ export function UploadField({ id, label, kind, value, onChange }: { id: string; 
     {value && kind === 'image' && <img src={mediaUrl(value)} alt="" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 16, marginBottom: 10, display: 'block' }} />}
     {value && kind === 'video' && <video controls src={mediaUrl(value)} style={{ width: '100%', borderRadius: 14, marginBottom: 10 }} aria-label="Demonstration video" />}
     <div className="actions-row" style={{ marginTop: 0 }}>
-      <label className="btn btn-quiet btn-small" htmlFor={id} aria-disabled={locked || isUploading || isSaving}><Upload size={15} /> {isUploading ? 'Uploading…' : value ? 'Replace' : `Choose ${kind}`}</label>
+      <label className="btn btn-quiet btn-small" htmlFor={id} aria-disabled={locked || isUploading || isSaving}><Upload size={15} /> {isUploading ? isSignedIn ? 'Uploading…' : 'Preparing…' : value ? 'Replace' : `Choose ${kind}`}</label>
       <input id={id} className="hidden-file" type="file" accept={kind === 'image' ? 'image/*' : 'video/*'} disabled={locked || isUploading || isSaving} onChange={(e) => { void pick(e.target.files?.[0]); e.target.value = ''; }} />
       {value && <button type="button" className="btn btn-quiet btn-small" disabled={isUploading} onClick={() => onChange('')}><Trash2 size={15} /> Remove</button>}
     </div>
-    {locked && <p className="hint">Sign in to upload videos that persist and can be shared.</p>}
-    {kind === 'image' && !isSignedIn && <p className="hint">Photos stay in this browser until you sign in and save.</p>}
-    {isUploading && <p className="hint" role="status">Uploading, please wait before saving.</p>}
+    {kind === 'image' && !isSignedIn && <p className="hint">Photographs are saved only in this browser.</p>}
+    {isUploading && <p className="hint" role="status">{isSignedIn ? 'Uploading, please wait before saving.' : 'Preparing photograph, please wait before saving.'}</p>}
     {err && <p className="error-text" role="alert">{err}</p>}
   </div>;
 }
 
 export function Shell({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  const { signOut } = useClerk();
-  const { isSignedIn, error, message, setError, refresh } = useWorkspace();
+  const { error, message, setError, refresh } = useWorkspace();
   const act = (a: boolean) => (a ? 'active' : '');
   return <div className="app">
     <aside className="side">
@@ -81,14 +86,9 @@ export function Shell({ children }: { children: ReactNode }) {
         <Link href="/paths" className={act(location.startsWith('/paths') || location.startsWith('/journey'))}><RouteIcon size={19} /> Training Paths</Link>
         <Link href="/milestones" className={act(location.startsWith('/milestones'))}><Layers size={19} /> Milestone Gallery</Link>
       </nav>
-      <div className="side-auth" style={{ marginTop: 'auto' }}>
-        {isSignedIn
-          ? <button className="btn btn-quiet btn-small" onClick={() => void signOut({ redirectUrl: basePath || '/' })}><LogOut size={15} /> Sign out</button>
-          : <Link href="/sign-in" className="btn btn-quiet btn-small"><LogIn size={15} /> Sign in</Link>}
-        <span className="side-note" style={{ marginTop: 0 }}>{isSignedIn ? 'Private trainer workspace' : 'Prototype on this browser'}</span>
-      </div>
     </aside>
     <div className="content">
+      <div className="main demo-notice" role="note"><strong>Demo mode · Records are saved in this browser.</strong><p>Records do not sync across devices and may be lost if browser data is cleared.</p></div>
       {error && <div className="main" style={{ paddingBottom: 0, paddingTop: 20 }}><div className="banner bad" role="alert">{error}<button className="btn btn-small" onClick={() => void refresh()}>Reload records</button><button className="icon-btn" aria-label="Dismiss" onClick={() => setError('')}><X size={16} /></button></div></div>}
       {children}
     </div>

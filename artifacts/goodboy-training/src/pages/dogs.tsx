@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, Map, Pencil, Plus, Save, Trash2, Dog as DogIcon 
 import { useWorkspace } from '@/lib/workspace';
 import { ageLabel, newId, type DogProfile } from '@/lib/training';
 import { DogPhoto, Label, Loading, Modal, NotFoundCard, ProgressBar, UploadField, assignmentStats } from '@/components/shared';
-import { ShareHandlerButton } from '@/components/share-handler';
 
 const today = () => new Date().toLocaleDateString('sv');
 
@@ -41,14 +40,13 @@ function DogFormModal({ dog, onClose, onSaved }: { dog?: DogProfile; onClose: ()
 }
 
 export function DogsPage() {
-  const { state, isLoading, isSignedIn } = useWorkspace();
+  const { state, isLoading } = useWorkspace();
   const [, go] = useLocation();
   const [adding, setAdding] = useState(false);
   if (isLoading) return <Loading />;
   return <main className="main page-enter">
     <header className="top"><div><Label>Your training team</Label><h1>My Dogs</h1><p className="lede">Pick a dog to see its profile, paths and progress.</p></div>
       <button className="btn" onClick={() => setAdding(true)}><Plus size={16} /> Add New Dog</button></header>
-    {!isSignedIn && <div className="banner">This is a prototype saved only in this browser. Sign in to keep records private, upload videos and share with handlers.<Link href="/sign-in" className="btn btn-small">Sign in</Link></div>}
     {state.dogs.length ? <div className="dogs-grid">{state.dogs.map((dog) => {
       const mine = state.assignments.filter((a) => a.dogId === dog.id).map((a) => assignmentStats(state, a));
       const first = mine[0];
@@ -114,7 +112,6 @@ export function DogProfilePage() {
           <h3 style={{ margin: 0 }}>{s.path.name}</h3><ProgressBar done={s.done} total={s.total} /><p className="hint">{s.done} of {s.total} completed · {s.active} in progress</p>
           <div className="actions-row" style={{ marginTop: 0 }}>
             <Link href={`/journey/${s.path.id}?dog=${dog.id}`} className="btn btn-small"><Map size={15} /> Open journey</Link>
-            <ShareHandlerButton small dog={dog} assignment={a} pathName={s.path.name} />
             <button className="icon-btn" aria-label={`Remove ${s.path.name}`} disabled={busy} onClick={() => void unassign(a.id, s.path!.name)}><Trash2 size={15} /></button>
           </div></div>; })}
         {free.length > 0 ? <div className="actions-row"><select className="inline-select" aria-label="Path to assign" value={pick} onChange={(e) => setPick(e.target.value)}><option value="">Choose a path</option>{free.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>

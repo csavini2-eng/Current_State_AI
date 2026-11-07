@@ -1,63 +1,64 @@
-# GoodBoy — shared dog training journey
+# GoodBoy
 
-GoodBoy is a responsive trainer website for managing multiple dogs, reusing training milestones, tracking each dog’s progress, and sharing live approved guidance with handlers.
+**GoodBoy is a training journey tool that helps trainers and dog handlers follow the same plan for a service dog in training.**
 
-## The problem
+## What this slice lets a user do
 
-When several people train the same dog, cues and expectations can diverge, while important context is scattered across messages, videos, and notes. GoodBoy keeps the training path and trainer-written skill guidance together so each handler can follow the same method.
+- Add a new dog (name, breed, type, handler). Saving with no name is blocked with a message.
+- Assign a training path (for example "Foundation Skills") to that dog.
+- Open the dog's journey and set each milestone to Not started, In progress, or Completed. A counter shows how many are completed.
+- Read each milestone’s completion objective and open **View instructions** for the trainer’s cue, optional hand signal, and practice instructions.
+- Edit the reusable original or customize a milestone for just one path. Reading or editing instructions never marks a milestone complete.
 
-## Main flow
+## Open the prototype
 
-1. Create or edit dog profiles in **My Dogs**, including birthday, handler, and photograph.
-2. Create, edit, search, or duplicate reusable skills in **Milestone Gallery**.
-3. Select several milestones and add them to a **Training Path**.
-4. Assign the path to one or more dogs. Each dog has independent progress.
-5. Edit an original milestone to update its linked paths, or **Customize for this path** to keep a path-specific version.
-6. Sign in, save the records, and use **Share With Handler** to create a live read-only guide.
-7. Save instruction or progress updates; the same handler link shows the latest version. Revoke a link to stop access.
+Live app: https://good-boy-dog-training-platform.replit.app
 
-The signed-out prototype saves records only in the current browser. Signing in enables private PostgreSQL records and persistent App Storage uploads. Handlers do not need an account; anyone with their link can read that one dog/path, but cannot edit it. Handler names label the intended recipient rather than authenticate their identity.
+Open the preview and use **Add New Dog**. The public demo has no sign-in dependency or account prompts. Records stay in this browser, do not sync across devices, and may be lost when browser data is cleared. Existing guest storage keys and records are retained.
 
-Legacy Raya records are migrated without deleting the original browser-local data. Existing cues and progress are retained. Older temporary demonstration videos cannot be recovered after refresh; upload them again for permanent sharing. Raya keeps her existing photograph until a replacement is uploaded, with no sample-portrait badge.
+Persistent video-upload and real-sharing controls are not part of this demo round. Existing private backend records, access-controlled media, and previously issued handler links remain protected; the demo never loads account workspaces.
 
-## Run and open the prototype
+Fresh Foundation Skills milestones have example completion objectives that trainers should tailor to each dog. Existing blank objectives are not backfilled: open the editor to review an offered example and save it explicitly. Existing cues, hand signals, instructions, and path customizations are not replaced.
 
-Open the **GoodBoy Training** web preview in Replit. Its managed web and API workflows must both run. To check types and helper regressions:
+## AI is not active
+
+No AI-analysis controls or confirmations are shown in this demo. No real model is connected.
+
+The planned behavior: the handler (the dog owner, not the trainer) uploads a training video. The AI tells them what they are doing right and what to improve. It also gives suggestions, such as flagging when a milestone is taking longer than usual.
+
+## Earlier live-app test results
+
+These three tests were recorded before the current demo update; they are not a claim that the updated build was tested in production.
+
+| Test | Input | Expected | Result |
+| --- | --- | --- | --- |
+| Typical | Add dog "Biscuit" (Labrador, Service dog in training, handler Maria), assign the Foundation Skills path, set Sit to Completed | Dog saved, journey shows 5 milestones, counter updates | Pass. The profile saved, 5 milestones showed, and the completed counter updated. |
+| Challenge | Mark Retrieve as Completed while Stay is still Not started | App handles an out-of-order milestone sensibly | Partial. It allowed the change and updated the counter, with no warning about the order. |
+| Invalid / empty | Save a new dog with an empty name | Dog is not saved and the user sees an error | Pass. "Add the dog's name." appeared and nothing was saved. |
+
+## Known limitations
+
+1. Demo records are browser-local, with no cross-device sync or automatic backup.
+2. There is no video analysis, persistent video upload, or real sharing control in the guest demo.
+3. Trainers must supply missing cues and practice instructions; the app does not invent them or enforce milestone order. Foundation Skills objectives and Raya are sample data.
+
+## Local checks
 
 ```sh
 pnpm run typecheck
 pnpm --filter @workspace/goodboy-training run test
+PORT=22351 BASE_PATH=/ pnpm --filter @workspace/goodboy-training run build
 ```
 
-## AI behavior
+## Current demo verification
 
-The longer-term product direction is for an assistant to organize trainer notes, summarize recent progress, and surface possible differences in cues or methods. A trainer should review any future suggestions and retain control of training decisions.
+- Full workspace type checks passed; all 11 helper regression tests passed.
+- The production frontend build passed with authentication publishable-key variables unset. Vite still emits a nonblocking source-map warning for the existing tooltip component.
+- A signed-out browser completed: empty-name validation, dog creation, Foundation Skills assignment, instruction viewing, progress update, and reload persistence.
+- Keyboard checks confirmed Tab/Shift+Tab containment, Escape dismissal, and focus restoration to the same instruction button. The visible Close button also worked without changing progress.
+- A path-specific edit displayed all trainer-provided instruction fields and left the reusable original and progress unchanged.
+- A separate saved-record fixture retained IDs, blank objectives, existing cues/signals/instructions, completed progress, and another step’s customization. Example adoption changed only the draft until explicit Save.
+- At 390×844 the instruction dialog wrapped correctly, its Close button was accessible, and it had no horizontal overflow. The test content fit vertically; unusually long-content scrolling was not separately exercised.
+- Guest request monitoring showed no private API requests or external authentication-service traffic. Unsigned private workspace and upload requests still returned HTTP 401. Backend authorization code was not changed.
 
-This prototype has no live AI model. The skill form includes a predefined example that fills editable sample content and states that it is simulated. It does not make training decisions or mark skills complete.
-
-## Test cases
-
-TypeScript checks and seven helper regression tests pass. The following browser flows were verified with an isolated signed-in trainer account and a separate signed-out handler browser.
-
-| Case | Check | Recorded result |
-| --- | --- | --- |
-| Profiles | Create a dog with birthday and handler; upload a photograph; reload saved records. | Passed. |
-| Reuse and customization | Use one milestone in two paths; edit the original and customize only one path. | Passed; customization persisted after reload. |
-| Independent progress | Assign the same path to two dogs and complete a milestone for only one. | Passed. |
-| Live sharing | Open a guide without signing in; save changed guidance; read the update at the same URL. | Passed; no trainer editing controls. |
-| Persistent media | Upload a photograph and playable WebM, then view them in the signed-out handler guide. | Passed. |
-| Link management | Recover the same link after navigation/reload; revoke it from the reopened dialog. | Passed; the already-open guide became unavailable on polling. |
-| Privacy | Attempt unsigned workspace writes and upload requests. | Rejected with HTTP 401. |
-| Phone layout | Check trainer profile and journey at 390px. | Passed; no horizontal overflow. |
-
-## Known limitations
-
-- Anonymous data is browser-local. Sign-in is required for persistent videos and handler links.
-- Shared links grant read-only access to anyone holding the link; they are not emailed invitations or handler-authenticated accounts.
-- Live guides check for updates every 15 seconds. Revocation prevents further requests immediately, but cannot retract copies a recipient already downloaded.
-- Simultaneous trainer edits use revision checks; a stale tab must reload before saving.
-- Raya’s portrait is generated sample imagery, not a photo of the actual dog.
-
-## Brand directions
-
-GoodBoy is the working name. Early alternatives to explore are **Waymark** (a professional record that follows a journey), **OnePath** (emphasizes one shared training sequence), and **Cuekeeper** (emphasizes consistent commands). These are creative directions, not trademark or domain checks.
+These current checks ran against the development preview, not the published production site.

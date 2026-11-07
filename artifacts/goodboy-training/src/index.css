@@ -306,6 +306,17 @@ dd { margin:0; font-weight:900; text-align:right; }
 .guide-step video { width:100%; border-radius:14px; background:#2b1d16; }
 .auth-wrap { min-height:100dvh; display:grid; place-items:center; padding:20px; background:var(--cardbg); }
 .auth-wrap .auth-back { display:block; text-align:center; margin-top:14px; }
+.main.demo-notice { padding-top:16px; padding-bottom:0; font-size:12px; color:var(--mute); }
+.demo-notice p { margin:3px 0 0; }
+.milestone-objective { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.objective-edit { border:0; background:none; padding:3px 0 7px; color:var(--od); font-size:13px; font-weight:800; text-align:left; text-decoration:underline; }
+.objective-example { display:block; color:var(--mute); font-size:11px; font-weight:800; margin-bottom:6px; }
+.instructions-button { margin:4px 0 10px; width:100%; padding-left:8px; padding-right:8px; }
+.instructions-content section { margin-bottom:18px; }
+.instructions-content h3 { font-size:18px; margin:0 0 6px; }
+.instructions-content p { white-space:pre-wrap; overflow-wrap:anywhere; margin:0 0 8px; }
+.modal { max-height:calc(100dvh - 40px); overflow-y:auto; }
+.btn:focus-visible,.icon-btn:focus-visible,.objective-edit:focus-visible { outline:3px solid var(--od); outline-offset:4px; }
 .home-grid > *, .skill-grid > *, .path-left > * { min-width:0; }
 .inline-select { min-width:0; max-width:100%; }
 h1,h2,h3,dd { overflow-wrap:anywhere; }

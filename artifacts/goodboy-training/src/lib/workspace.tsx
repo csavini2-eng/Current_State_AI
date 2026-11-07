@@ -34,6 +34,57 @@ type WorkspaceContextValue = {
   refresh: () => Promise<void>;
 };
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
+export function GuestWorkspaceProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<TrainingWorkspace>(seedWorkspace);
+  const [error, setError] = useState('');
+  const [message, notify] = useState('');
+  const [isLoading, setLoading] = useState(true);
+  const [isSaving, setSaving] = useState(false);
+  const [isUploading, setUploading] = useState(false);
+  const blocked = useRef(true);
+  const refresh = async () => {
+    try {
+      setState(loadPrototype()); blocked.current = false; setError('');
+    } catch (error) {
+      blocked.current = true;
+      setError(error instanceof Error ? error.message : 'Browser storage is unavailable. Existing records have not been changed.');
+    } finally { setLoading(false); }
+  };
+  useEffect(() => { void refresh(); }, []);
+  useEffect(() => {
+    if (!message) return;
+    const timer = window.setTimeout(() => notify(''), 4000);
+    return () => window.clearTimeout(timer);
+  }, [message]);
+  const save = async (next: TrainingWorkspace) => {
+    if (blocked.current) { setError('Saved records could not be loaded. Reload records before saving; your existing data has not been overwritten.'); return false; }
+    setSaving(true);
+    try {
+      const copy = structuredClone(next);
+      localStorage.setItem('goodboy-prototype-v2', JSON.stringify(copy));
+      setState(copy); setError(''); return true;
+    } catch {
+      setError('Changes could not be saved in this browser. Browser storage may be full or unavailable. Your form has been kept open.');
+      return false;
+    } finally { setSaving(false); }
+  };
+  const upload = async (file: File) => {
+    setUploading(true);
+    try {
+      if (!file.type.startsWith('image/')) throw new Error('Only local photograph selection is available in this demo.');
+      if (file.size > 50 * 1024 * 1024) throw new Error('Choose a photograph smaller than 50 MB.');
+      const image = await prepareImage(file);
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error('Could not read this photograph.'));
+        reader.readAsDataURL(image);
+      });
+    } finally { setUploading(false); }
+  };
+  return <WorkspaceContext.Provider value={{ state, error, message, setError, notify, save, upload, refresh, isLoading, isSaving, isUploading, isSignedIn: false }}>{children}</WorkspaceContext.Provider>;
+}
+// Retained for authenticated integrations; the public demo never mounts this provider.
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { isLoaded, isSignedIn, userId } = useAuth();
   const [state, setState] = useState<TrainingWorkspace>(seedWorkspace);
