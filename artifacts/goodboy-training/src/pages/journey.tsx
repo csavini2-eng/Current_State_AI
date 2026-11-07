@@ -1,6 +1,8 @@
-import { type CSSProperties, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { transitionProgress, type CompletionEvent } from '@/lib/progress';
+import { isSampleSit, SAMPLE_FEEDBACK_SOURCE } from '@/lib/sample-sit';
 import { Link, useLocation, useParams, useSearch } from 'wouter';
-import { ArrowDown, ArrowLeft, ArrowUp, Check, Circle, Pencil, Play, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, Check, CheckCircle2, Circle, Pencil, Play, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
 import { assignmentMilestones, foundationObjectiveExample, isExampleObjective, newId, statusLabel, type AssignedMilestone, type MilestoneContent, type Status } from '@/lib/training';
 import { Label, Loading, Modal, NotFoundCard, contentOf, stepItems, templateById } from '@/components/shared';
@@ -22,6 +24,12 @@ export function JourneyPage() {
   // Async video commits (after IndexedDB writes) must build from the latest workspace, not a stale render.
   const stateRef = useRef(state);
   stateRef.current = state;
+  const [celebration, setCelebration] = useState<CompletionEvent | null>(null);
+  const [progressError, setProgressError] = useState('');
+  const busyRef = useRef(false);
+  const scopeKey = `${pathId}|${search}`;
+  useEffect(() => { setCelebration(null); setProgressError(''); }, [scopeKey]);
+  useEffect(() => { if (!celebration) return; const t = window.setTimeout(() => setCelebration(null), 6000); return () => window.clearTimeout(t); }, [celebration]);
   if (isLoading) return <Loading />;
   const path = state.paths.find((p) => p.id === pathId);
   if (!path) return <NotFoundCard title="Path not found" text="This path may have been removed." href="/paths" cta="Back to paths" />;
@@ -69,7 +77,22 @@ export function JourneyPage() {
       return base ? { ...s, customization: { ...contentOf(base), videoPath: ref } } : s;
     }) }) });
   };
-  const setStatus = (id: string, status: Status) => { if (assignment) void saveDog(snapshot, { ...assignment.progress, [id]: status }); };
+  const setStatus = async (id: string, status: Status) => {
+    if (!assignment || busyRef.current) return;
+    busyRef.current = true; setProgressError('');
+    try {
+      const { next, celebration: ev } = transitionProgress(stateRef.current, assignment.id, id, status);
+      if (next === stateRef.current) return;
+      const ok = await save(next);
+      if (!ok) { setProgressError('Progress could not be saved. Nothing changed; try again.'); return; }
+      setCelebration(ev);
+    } catch (e) { setProgressError(e instanceof Error ? e.message : 'Progress could not be saved.'); }
+    finally { busyRef.current = false; }
+  };
+  const saveNote = (stepId: string, text: string | null) => {
+    if (!assignment) return Promise.resolve(false);
+    return commitMilestone(assignment.id, stepId, (m) => { if (text === null) { const { sampleFeedbackNote: _n, ...rest } = m; return rest; } return { ...m, sampleFeedbackNote: { source: SAMPLE_FEEDBACK_SOURCE, text } }; });
+  };
   const move = (i: number, d: number) => {
     const j = i + d; if (j < 0 || j >= items.length) return;
     if (assignment) { const s = [...snapshot]; [s[i], s[j]] = [s[j], s[i]]; void saveDog(s); }
@@ -94,11 +117,11 @@ export function JourneyPage() {
     } else ok = await savePath([...path.steps, ...chosen.map((templateId) => ({ id: newId(), templateId, customization: null }))]);
     if (ok) { setAdding(false); setChosen([]); }
   };
-  const switchScope = (v: string) => go(v === '__path' ? `/journey/${path.id}?scope=path` : `/journey/${path.id}?dog=${encodeURIComponent(v)}`);
+  const switchScope = (v: string) => go(`/journey/${path.id}?dog=${encodeURIComponent(v)}`);
   const editItem = items.find((i) => i.id === editorId);
   const shown = items.find((i) => i.id === instructionsId);
   const stats = assignment ? { total: items.length, done: items.filter((i) => statusOf(i.id) === 'completed').length, active: items.filter((i) => statusOf(i.id) === 'in-progress').length } : null;
-  const STEP = 300;
+  const STEP = assignment ? 360 : 300;
   const xs = items.map((_, i) => 50 + 26 * Math.sin((i * Math.PI) / 2));
   const mobileXs = items.map((_, i) => i % 2 ? 78 : 22);
   const height = items.length * STEP + 40;
@@ -106,17 +129,19 @@ export function JourneyPage() {
   const pickList = state.milestones.filter((m) => m.name.toLowerCase().includes(q.toLowerCase()));
   const editLabel = (name: string) => assignment ? `Edit ${name} for ${dogName}` : `Edit ${name} for this path`;
   return <main className="main page-enter">
-    <Link href={assignment ? `/dogs/${assignment.dogId}` : '/paths'} className="back"><ArrowLeft size={15} /> {assignment ? `${dogName}’s profile` : 'All paths'}</Link>
+    <Link href={assignment ? `/dogs/${assignment.dogId}` : '/paths'} className="back" data-testid="link-back"><ArrowLeft size={15} /> {assignment ? `${dogName}’s profile` : 'Back to Training Paths'}</Link>
     <header className="top journey-top"><div><Label>{assignment ? `${dogName}’s training journey` : 'Reusable path'}</Label><h1>{path.name}</h1><p className="lede">{path.description || 'Add milestones to build this path.'}</p></div>
       {stats && <div className="journey-stats"><div className="stat"><b>{stats.total}</b><span>Milestones</span></div><div className="stat s-yellow"><b>{stats.active}</b><span>In progress</span></div><div className="stat s-green"><b>{stats.done}</b><span>Completed</span></div></div>}</header>
     <div className="dog-switch">
-      <label htmlFor="active-scope">Viewing</label>
-      <select id="active-scope" className="inline-select" value={assignment ? assignment.dogId : '__path'} disabled={isSaving} onChange={(e) => switchScope(e.target.value)}>
+      {assignment && mine.length > 1 && <><label htmlFor="active-scope">Viewing</label>
+      <select id="active-scope" className="inline-select" value={assignment.dogId} disabled={isSaving} onChange={(e) => switchScope(e.target.value)}>
         {mine.map((a) => <option key={a.id} value={a.dogId}>{state.dogs.find((d) => d.id === a.dogId)?.name ?? 'Dog'}’s journey</option>)}
-        <option value="__path">Reusable path (for future assignments)</option>
-      </select>
+      </select></>}
+      {!assignment && <span className="tag">Reusable path editor</span>}
       <button className="btn btn-quiet btn-small" style={{ marginLeft: 'auto' }} disabled={isSaving} onClick={() => setAdding(true)}><Plus size={15} /> {assignment ? `Add for ${dogName}` : 'Add milestones'}</button>
     </div>
+    <div className="celebrate-status" role="status" aria-live="polite" data-testid="status-celebration">{celebration && <div className="celebrate-banner"><CheckCircle2 size={18} /><span>{celebration.message}{celebration.pathCompleted && <b> Training path completed. Great teamwork!</b>}</span></div>}</div>
+    {progressError && <p className="error-text" role="alert">{progressError}</p>}
     <p className="scope-note" role="note">{scopeNote}{!assignment && mine.length === 0 ? ' Not assigned to a dog yet; assign it on Training Paths to track progress.' : ''}</p>
     {items.length ? <section className="journey" style={{ height }} aria-label="Milestone progression">
       <svg viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" className="trail trail-desktop" aria-hidden="true"><path d={trail(xs)} vectorEffect="non-scaling-stroke" /></svg>
@@ -125,8 +150,10 @@ export function JourneyPage() {
         const { content } = item;
         const st = statusOf(item.id);
         const name = content.name || 'Untitled skill';
-        return <div className={`node-wrap status-${st}`} key={item.id} style={{ '--step-x': `${xs[i]}%`, top: i * STEP + 70 } as CSSProperties}>
+        const party = celebration?.stepId === item.id && celebration.assignmentId === assignment?.id;
+        return <div className={`node-wrap status-${st}${party ? ' just-done' : ''}`} key={item.id} style={{ '--step-x': `${xs[i]}%`, top: i * STEP + 70 } as CSSProperties}>
           <div className="node" role="img" aria-label={`Step ${i + 1}, ${statusLabel[st]}`}>{st === 'completed' ? <Check size={34} strokeWidth={3} /> : st === 'in-progress' ? <Play size={30} fill="currentColor" /> : <span>{i + 1}</span>}</div>
+          {party && <div className="confetti" aria-hidden="true">{Array.from({ length: 14 }, (_, k) => <i key={k} style={{ '--k': k } as CSSProperties} />)}</div>}
           <div className={`node-card card ${xs[i] > 50 ? 'to-left' : 'to-right'}`}>
             <h3>{name}</h3>
             {content.description.trim()
@@ -135,7 +162,13 @@ export function JourneyPage() {
             {isExampleObjective(content.description) && <span className="objective-example">Example · tailor to this dog</span>}
             {item.customized && <span className="tag">Path copy</span>}
             <button type="button" className="btn btn-quiet btn-small instructions-button" aria-label={`View instructions for ${name}`} onClick={event => { event.currentTarget.focus({ preventScroll: true }); setInstructionsId(item.id); }}>View instructions</button>
-            {assignment && <div className="node-actions"><select aria-label={`Status for ${name}`} className={`status-select pill-${st}`} value={st} disabled={isSaving} onChange={(e) => setStatus(item.id, e.target.value as Status)}><option value="not-started">Not started</option><option value="in-progress">In progress</option><option value="completed">Completed</option></select></div>}
+            {assignment && <div className="progress-controls" data-testid={`progress-${item.id}`}>
+              <span className={`pill pill-${st}`}>{st === 'completed' && <Check size={12} strokeWidth={3} />}{statusLabel[st]}</span>
+              {st === 'not-started' && <button type="button" className="btn btn-small" disabled={isSaving} onClick={() => void setStatus(item.id, 'in-progress')}>Start practicing</button>}
+              {st === 'in-progress' && <><button type="button" className="btn btn-quiet btn-small" onClick={(e) => { e.currentTarget.focus({ preventScroll: true }); setInstructionsId(item.id); }}>Continue practicing</button><button type="button" className="btn btn-small btn-done" disabled={isSaving} onClick={() => void setStatus(item.id, 'completed')}>Mark completed</button></>}
+              {st === 'completed' && <button type="button" className="btn btn-quiet btn-small" disabled={isSaving} onClick={() => void setStatus(item.id, 'in-progress')}>Practice again</button>}
+              {st !== 'not-started' && <button type="button" className="link-btn" disabled={isSaving} onClick={() => void setStatus(item.id, 'not-started')}>Reset to not started</button>}
+            </div>}
             <div className="step-actions">
               <button className="icon-btn" aria-label={`Move ${name} earlier`} disabled={isSaving || i === 0} onClick={() => move(i, -1)}><ArrowUp size={14} /></button>
               <button className="icon-btn" aria-label={`Move ${name} later`} disabled={isSaving || i === items.length - 1} onClick={() => move(i, 1)}><ArrowDown size={14} /></button>
@@ -154,9 +187,10 @@ export function JourneyPage() {
       <div className="modal-scroll">{pickList.length ? pickList.map((m) => <label className="check" key={m.id} style={{ padding: '8px 0' }}><input type="checkbox" checked={chosen.includes(m.id)} onChange={() => setChosen((c) => c.includes(m.id) ? c.filter((x) => x !== m.id) : [...c, m.id])} /> {m.name || 'Untitled skill'}{items.some((s) => s.templateId === m.id) && <span className="tag">Already included</span>}</label>) : <p className="hint">No milestones found. <Link href="/milestones">Create one in the gallery.</Link></p>}</div>
       <div className="form-actions"><button className="btn btn-quiet" onClick={() => go('/milestones')}>Open gallery</button><button className="btn" disabled={!chosen.length || isSaving} onClick={() => void addChosen()}>Add {chosen.length || ''} {assignment ? `for ${dogName}` : 'to path'}</button></div>
     </Modal>}
-    {shown && <MilestoneInstructions content={shown.content} scopeNote={scopeNote} onClose={() => setInstructionsId(null)}
+    {shown && <MilestoneInstructions content={shown.content} templateId={shown.templateId}
+      note={assignment ? { dogName, value: snapshot.find((m) => m.id === shown.id)?.sampleFeedbackNote, onSave: (t) => saveNote(shown.id, t), onRemove: () => saveNote(shown.id, null) } : undefined} scopeNote={scopeNote} onClose={() => setInstructionsId(null)}
       onDemoChange={(ref) => assignment ? commitMilestone(assignment.id, shown.id, (m) => ({ ...m, content: { ...m.content, videoPath: ref } })) : commitPathDemo(shown.id, ref)}
       practice={assignment ? { dogName, value: shown.practiceVideoPath, onChange: (ref) => commitMilestone(assignment.id, shown.id, (m) => ({ ...m, practiceVideoPath: ref })) } : undefined} />}
-    {editItem && <MilestoneEditor title={editLabel(editItem.content.name || 'skill')} note={scopeNote} initial={contentOf(editItem.content)} objectiveExample={foundationObjectiveExample(editItem.templateId, editItem.content.name)} onClose={() => setEditorId(null)} onSave={(c) => updateContent(editItem.id, () => c)} />}
+    {editItem && <MilestoneEditor title={editLabel(editItem.content.name || 'skill')} note={scopeNote} initial={contentOf(editItem.content)} objectiveExample={foundationObjectiveExample(editItem.templateId, editItem.content.name)} templateId={editItem.templateId} offerSample={!!assignment && isSampleSit(editItem.templateId, editItem.content)} onClose={() => setEditorId(null)} onSave={(c) => updateContent(editItem.id, () => c)} />}
   </main>;
 }

@@ -22,6 +22,8 @@ export * from './milestoneContent';
 export * from './milestoneContentDifficulty';
 export * from './milestoneTemplate';
 export * from './pathStep';
+export * from './sampleFeedbackNote';
+export * from './sampleFeedbackNoteSource';
 export * from './trainingProgram';
 export * from './trainingWorkspace';
 export * from './trainingWorkspaceVersion';

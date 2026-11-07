@@ -1,6 +1,8 @@
 import test, { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { seedWorkspace, loadPrototype, resolveStep, ageLabel, mediaUrl, foundationObjectives, foundationObjectiveExample, isExampleObjective, createAssignment, migrateAssignments, assignmentMilestones } from './training.ts';
+import { fillBlankSitFields, isSampleSit, SAMPLE_SIT_CUE, SAMPLE_SIT_OBJECTIVE, SAMPLE_SIT_INSTRUCTIONS, SAMPLE_FEEDBACK_DISCLOSURE, SAMPLE_FEEDBACK_SOURCE, SAMPLE_FEEDBACK_TEXT } from './sample-sit.ts';
+import { transitionProgress } from './progress.ts';
 
 const values = new Map();
 globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
@@ -58,12 +60,12 @@ test('malformed legacy data is not silently overwritten', () => {
   assert.throws(() => loadPrototype());
   assert.equal(values.get('goodboy-prototype-v1'), '{broken');
 });
-test('new sample milestones get exactly the supplied example objectives, never invented signals or cues', () => {
+test('new sample milestones use only supplied objectives and the explicitly requested Sit plan, never invented signals', () => {
   for (const milestone of seedWorkspace().milestones) {
     assert.equal(milestone.description, foundationObjectives[milestone.id]);
-    assert.equal(milestone.command, '');
+    assert.equal(milestone.command, milestone.id === 'sit' ? SAMPLE_SIT_CUE : '');
     assert.equal(milestone.handSignal, '');
-    assert.equal(milestone.instructions, '');
+    assert.equal(milestone.instructions, milestone.id === 'sit' ? SAMPLE_SIT_INSTRUCTIONS : '');
     assert.equal(isExampleObjective(milestone.description), true);
   }
 });
@@ -156,4 +158,95 @@ test('an intentionally empty dog journey stays empty and does not inherit newly 
   state.assignments[0].milestones = [];
   const migrated = migrateAssignments(state);
   assert.deepEqual(assignmentMilestones(migrated, migrated.assignments[0]), []);
+});
+test('new Sit samples have the supplied written plan without replacing personal video slots', () => {
+  const state = seedWorkspace();
+  const sit = state.assignments[0].milestones[0];
+  assert.equal(sit.content.command, 'Sit.');
+  assert.equal(sit.content.description, SAMPLE_SIT_OBJECTIVE);
+  assert.equal(sit.content.instructions, SAMPLE_SIT_INSTRUCTIONS);
+  assert.equal(sit.content.handSignal, '');
+  assert.equal(sit.content.videoPath, '');
+  assert.equal(sit.practiceVideoPath, '');
+  assert.equal(isSampleSit('sit', sit.content), true);
+  assert.equal(isSampleSit('custom-sit', sit.content), false);
+});
+test('explicit sample fill changes only blank draft fields, not saved trainer content or videos', () => {
+  const state = seedWorkspace();
+  const content = { ...state.assignments[0].milestones[0].content, command: 'Trainer cue', description: ' ', instructions: '', handSignal: 'Trainer signal', videoPath: 'local-video:owned-demo' };
+  const before = structuredClone(content);
+  const draft = fillBlankSitFields(content);
+  assert.deepEqual(content, before);
+  assert.equal(draft.command, 'Trainer cue');
+  assert.equal(draft.description, SAMPLE_SIT_OBJECTIVE);
+  assert.equal(draft.instructions, SAMPLE_SIT_INSTRUCTIONS);
+  assert.equal(draft.handSignal, 'Trainer signal');
+  assert.equal(draft.videoPath, 'local-video:owned-demo');
+});
+test('existing blank Sit records and personal clips are not silently populated on reload', () => {
+  const state = seedWorkspace();
+  const sit = state.assignments[0].milestones[0];
+  sit.content.command = ''; sit.content.instructions = '';
+  sit.content.videoPath = 'local-video:existing-demo';
+  sit.practiceVideoPath = 'local-video:existing-practice';
+  const original = JSON.stringify(state);
+  values.set('goodboy-prototype-v2', original);
+  const loaded = loadPrototype();
+  assert.deepEqual(loaded, state);
+  assert.equal(loaded.assignments[0].milestones[0].content.command, '');
+  assert.equal(values.get('goodboy-prototype-v2'), original);
+});
+test('prepared sample feedback is explicitly simulated and includes the stated limitations', () => {
+  assert.equal(SAMPLE_FEEDBACK_SOURCE, 'Simulated sample feedback');
+  assert.equal(SAMPLE_FEEDBACK_DISCLOSURE, 'Simulated feedback · Prepared observations about this sample clip. No automated video analysis is running.');
+  assert.match(SAMPLE_FEEDBACK_TEXT, /Near the end of the clip, the dog moves from standing to sitting/);
+  assert.match(SAMPLE_FEEDBACK_TEXT, /This clip has no audio/);
+  assert.match(SAMPLE_FEEDBACK_TEXT, /consistency across repeated attempts cannot be confirmed/);
+  assert.match(SAMPLE_FEEDBACK_TEXT, /before deciding whether to mark the milestone completed/);
+});
+test('progress transitions are immutable, dog-specific and emit completion intent only for new completions', () => {
+  const state = seedWorkspace();
+  state.dogs.push({ ...state.dogs[0], id: 'doug', name: 'Doug' });
+  state.assignments.push(createAssignment(state, 'doug', 'foundation', 'doug-foundation'));
+  const original = structuredClone(state);
+  const practicing = transitionProgress(state, 'raya-foundation', 'step-sit', 'in-progress');
+  assert.equal(practicing.celebration, null);
+  const done = transitionProgress(practicing.next, 'raya-foundation', 'step-sit', 'completed');
+  assert.equal(done.celebration.message, 'Sit completed! Raya has completed 1 of 5 milestones.');
+  assert.equal(done.celebration.pathCompleted, false);
+  assert.deepEqual(done.next.assignments[1], original.assignments[1]);
+  assert.deepEqual(done.next.paths, original.paths);
+  assert.deepEqual(done.next.milestones, original.milestones);
+  assert.deepEqual(state, original);
+  assert.equal(transitionProgress(done.next, 'raya-foundation', 'step-sit', 'completed').celebration, null);
+  const again = transitionProgress(done.next, 'raya-foundation', 'step-sit', 'in-progress');
+  assert.equal(again.celebration, null);
+  assert.equal(transitionProgress(again.next, 'raya-foundation', 'step-sit', 'not-started').celebration, null);
+});
+test('final completion counts only this assignment’s current milestones', () => {
+  const state = seedWorkspace();
+  const a = state.assignments[0];
+  a.progress = { historical: 'completed', ...Object.fromEntries(a.milestones.slice(1).map(m => [m.id, 'completed'])) };
+  const result = transitionProgress(state, a.id, 'step-sit', 'completed');
+  assert.equal(result.celebration.pathCompleted, true);
+  assert.equal(result.celebration.message, 'Sit completed! Raya has completed 5 of 5 milestones.');
+});
+test('sample notes persist with source and remain independent of progress, videos, dogs and templates', () => {
+  const state = seedWorkspace();
+  state.assignments.push(createAssignment(state, 'doug', 'foundation', 'doug-foundation'));
+  const a = state.assignments[0];
+  a.milestones[0].content.videoPath = 'local-video:demo';
+  a.milestones[0].practiceVideoPath = 'local-video:practice';
+  a.milestones[0].sampleFeedbackNote = { source: SAMPLE_FEEDBACK_SOURCE, text: 'Trainer-edited sample observation' };
+  const originalProgress = structuredClone(a.progress);
+  values.set('goodboy-prototype-v2', JSON.stringify(state));
+  const loaded = loadPrototype();
+  assert.deepEqual(loaded.assignments[0].milestones[0].sampleFeedbackNote, a.milestones[0].sampleFeedbackNote);
+  assert.deepEqual(loaded.assignments[0].progress, originalProgress);
+  assert.equal(loaded.assignments[1].milestones[0].sampleFeedbackNote, undefined);
+  const done = transitionProgress(loaded, a.id, 'step-sit', 'completed');
+  assert.deepEqual(done.next.assignments[0].milestones[0], a.milestones[0]);
+  delete loaded.assignments[0].milestones[0].sampleFeedbackNote;
+  assert.equal(loaded.assignments[0].milestones[0].practiceVideoPath, 'local-video:practice');
+  assert.equal(loaded.assignments[1].milestones[0].sampleFeedbackNote, undefined);
 });
