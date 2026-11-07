@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { MilestoneContent } from './milestoneContent';
+import type { PracticeEntry } from './practiceEntry';
 import type { SampleFeedbackNote } from './sampleFeedbackNote';
 
 export interface AssignedMilestone {
@@ -23,4 +24,6 @@ export interface AssignedMilestone {
   /** @maxLength 500 */
   practiceVideoPath: string;
   sampleFeedbackNote?: SampleFeedbackNote;
+  /** @maxItems 200 */
+  practiceEntries?: PracticeEntry[];
 }

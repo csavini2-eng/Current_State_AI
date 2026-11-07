@@ -8,6 +8,1162 @@
 import * as zod from 'zod';
 
 
+export const beginGuestShareBodyDogIdMax = 100;
+
+export const beginGuestShareBodyDogNameMax = 150;
+
+export const beginGuestShareBodyDogBreedMax = 150;
+
+export const beginGuestShareBodyDogTrainingTypeMax = 150;
+
+export const beginGuestShareBodyDogBirthDateMax = 10;
+
+export const beginGuestShareBodyDogHandlerNameMax = 150;
+
+export const beginGuestShareBodyDogPhotoMax = 500;
+
+export const beginGuestShareBodyPathIdMax = 100;
+
+export const beginGuestShareBodyPathNameMax = 150;
+
+export const beginGuestShareBodyPathDescriptionMax = 2000;
+
+export const beginGuestShareBodyAssignmentIdMax = 100;
+
+export const beginGuestShareBodyAssignmentDogIdMax = 100;
+
+export const beginGuestShareBodyAssignmentPathIdMax = 100;
+
+export const beginGuestShareBodyAssignmentMilestonesItemIdMax = 100;
+
+export const beginGuestShareBodyAssignmentMilestonesItemTemplateIdMax = 100;
+
+export const beginGuestShareBodyAssignmentMilestonesItemContentNameMax = 150;
+
+export const beginGuestShareBodyAssignmentMilestonesItemContentDescriptionMax = 1000;
+
+export const beginGuestShareBodyAssignmentMilestonesItemContentCommandMax = 500;
+
+export const beginGuestShareBodyAssignmentMilestonesItemContentHandSignalMax = 2000;
+
+export const beginGuestShareBodyAssignmentMilestonesItemContentInstructionsMax = 12000;
+
+export const beginGuestShareBodyAssignmentMilestonesItemContentCategoryMax = 100;
+
+export const beginGuestShareBodyAssignmentMilestonesItemContentVideoPathMax = 500;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeVideoPathMax = 500;
+
+export const beginGuestShareBodyAssignmentMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesMax = 200;
+
+export const beginGuestShareBodyAssignmentMilestonesMax = 200;
+
+
+
+export const BeginGuestShareBody = zod.object({
+  "dog": zod.object({
+  "id": zod.string().min(1).max(beginGuestShareBodyDogIdMax),
+  "name": zod.string().min(1).max(beginGuestShareBodyDogNameMax),
+  "breed": zod.string().max(beginGuestShareBodyDogBreedMax),
+  "trainingType": zod.string().max(beginGuestShareBodyDogTrainingTypeMax),
+  "birthDate": zod.string().max(beginGuestShareBodyDogBirthDateMax),
+  "handlerName": zod.string().max(beginGuestShareBodyDogHandlerNameMax),
+  "photo": zod.string().max(beginGuestShareBodyDogPhotoMax)
+}),
+  "path": zod.object({
+  "id": zod.string().min(1).max(beginGuestShareBodyPathIdMax),
+  "name": zod.string().max(beginGuestShareBodyPathNameMax),
+  "description": zod.string().max(beginGuestShareBodyPathDescriptionMax)
+}),
+  "assignment": zod.object({
+  "id": zod.string().min(1).max(beginGuestShareBodyAssignmentIdMax),
+  "dogId": zod.string().min(1).max(beginGuestShareBodyAssignmentDogIdMax),
+  "pathId": zod.string().min(1).max(beginGuestShareBodyAssignmentPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(beginGuestShareBodyAssignmentMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(beginGuestShareBodyAssignmentMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemContentNameMax),
+  "description": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(beginGuestShareBodyAssignmentMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax)
+}).optional()
+})).max(beginGuestShareBodyAssignmentMilestonesItemPracticeEntriesMax).optional()
+})).max(beginGuestShareBodyAssignmentMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
+  "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
+})
+})
+
+export const BeginGuestShareResponse = zod.object({
+  "id": zod.string(),
+  "managementToken": zod.string(),
+  "handlerToken": zod.string()
+})
+
+
+export const resolveGuestShareResponseSnapshotDogIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotDogNameMax = 150;
+
+export const resolveGuestShareResponseSnapshotDogBreedMax = 150;
+
+export const resolveGuestShareResponseSnapshotDogTrainingTypeMax = 150;
+
+export const resolveGuestShareResponseSnapshotDogBirthDateMax = 10;
+
+export const resolveGuestShareResponseSnapshotDogHandlerNameMax = 150;
+
+export const resolveGuestShareResponseSnapshotDogPhotoMax = 500;
+
+export const resolveGuestShareResponseSnapshotPathIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotPathNameMax = 150;
+
+export const resolveGuestShareResponseSnapshotPathDescriptionMax = 2000;
+
+export const resolveGuestShareResponseSnapshotAssignmentIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotAssignmentDogIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotAssignmentPathIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemTemplateIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentNameMax = 150;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentDescriptionMax = 1000;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentCommandMax = 500;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentHandSignalMax = 2000;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentInstructionsMax = 12000;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentCategoryMax = 100;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentVideoPathMax = 500;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax = 500;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax = 200;
+
+export const resolveGuestShareResponseSnapshotAssignmentMilestonesMax = 200;
+
+export const resolveGuestShareResponseEntriesItemIdMax = 100;
+
+export const resolveGuestShareResponseEntriesItemMilestoneIdMax = 100;
+
+export const resolveGuestShareResponseEntriesItemCreatedAtMax = 50;
+
+export const resolveGuestShareResponseEntriesItemVideoPathMax = 500;
+
+export const resolveGuestShareResponseEntriesItemDescriptionMax = 4000;
+
+export const resolveGuestShareResponseEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const resolveGuestShareResponseEntriesItemFeedbackTextMax = 10000;
+
+
+
+export const ResolveGuestShareResponse = zod.object({
+  "id": zod.string(),
+  "snapshot": zod.object({
+  "dog": zod.object({
+  "id": zod.string().min(1).max(resolveGuestShareResponseSnapshotDogIdMax),
+  "name": zod.string().min(1).max(resolveGuestShareResponseSnapshotDogNameMax),
+  "breed": zod.string().max(resolveGuestShareResponseSnapshotDogBreedMax),
+  "trainingType": zod.string().max(resolveGuestShareResponseSnapshotDogTrainingTypeMax),
+  "birthDate": zod.string().max(resolveGuestShareResponseSnapshotDogBirthDateMax),
+  "handlerName": zod.string().max(resolveGuestShareResponseSnapshotDogHandlerNameMax),
+  "photo": zod.string().max(resolveGuestShareResponseSnapshotDogPhotoMax)
+}),
+  "path": zod.object({
+  "id": zod.string().min(1).max(resolveGuestShareResponseSnapshotPathIdMax),
+  "name": zod.string().max(resolveGuestShareResponseSnapshotPathNameMax),
+  "description": zod.string().max(resolveGuestShareResponseSnapshotPathDescriptionMax)
+}),
+  "assignment": zod.object({
+  "id": zod.string().min(1).max(resolveGuestShareResponseSnapshotAssignmentIdMax),
+  "dogId": zod.string().min(1).max(resolveGuestShareResponseSnapshotAssignmentDogIdMax),
+  "pathId": zod.string().min(1).max(resolveGuestShareResponseSnapshotAssignmentPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentNameMax),
+  "description": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax)
+}).optional()
+})).max(resolveGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax).optional()
+})).max(resolveGuestShareResponseSnapshotAssignmentMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
+  "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
+})
+}),
+  "entries": zod.array(zod.object({
+  "id": zod.string().min(1).max(resolveGuestShareResponseEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(resolveGuestShareResponseEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(resolveGuestShareResponseEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(resolveGuestShareResponseEntriesItemVideoPathMax),
+  "description": zod.string().max(resolveGuestShareResponseEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(resolveGuestShareResponseEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(resolveGuestShareResponseEntriesItemFeedbackTextMax)
+}).optional()
+})),
+  "active": zod.boolean(),
+  "revoked": zod.boolean(),
+  "revision": zod.number().int()
+})
+
+
+export const GetGuestShareParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const getGuestShareResponseSnapshotDogIdMax = 100;
+
+export const getGuestShareResponseSnapshotDogNameMax = 150;
+
+export const getGuestShareResponseSnapshotDogBreedMax = 150;
+
+export const getGuestShareResponseSnapshotDogTrainingTypeMax = 150;
+
+export const getGuestShareResponseSnapshotDogBirthDateMax = 10;
+
+export const getGuestShareResponseSnapshotDogHandlerNameMax = 150;
+
+export const getGuestShareResponseSnapshotDogPhotoMax = 500;
+
+export const getGuestShareResponseSnapshotPathIdMax = 100;
+
+export const getGuestShareResponseSnapshotPathNameMax = 150;
+
+export const getGuestShareResponseSnapshotPathDescriptionMax = 2000;
+
+export const getGuestShareResponseSnapshotAssignmentIdMax = 100;
+
+export const getGuestShareResponseSnapshotAssignmentDogIdMax = 100;
+
+export const getGuestShareResponseSnapshotAssignmentPathIdMax = 100;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemIdMax = 100;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemTemplateIdMax = 100;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemContentNameMax = 150;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemContentDescriptionMax = 1000;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemContentCommandMax = 500;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemContentHandSignalMax = 2000;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemContentInstructionsMax = 12000;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemContentCategoryMax = 100;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemContentVideoPathMax = 500;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax = 500;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax = 200;
+
+export const getGuestShareResponseSnapshotAssignmentMilestonesMax = 200;
+
+export const getGuestShareResponseEntriesItemIdMax = 100;
+
+export const getGuestShareResponseEntriesItemMilestoneIdMax = 100;
+
+export const getGuestShareResponseEntriesItemCreatedAtMax = 50;
+
+export const getGuestShareResponseEntriesItemVideoPathMax = 500;
+
+export const getGuestShareResponseEntriesItemDescriptionMax = 4000;
+
+export const getGuestShareResponseEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const getGuestShareResponseEntriesItemFeedbackTextMax = 10000;
+
+
+
+export const GetGuestShareResponse = zod.object({
+  "id": zod.string(),
+  "snapshot": zod.object({
+  "dog": zod.object({
+  "id": zod.string().min(1).max(getGuestShareResponseSnapshotDogIdMax),
+  "name": zod.string().min(1).max(getGuestShareResponseSnapshotDogNameMax),
+  "breed": zod.string().max(getGuestShareResponseSnapshotDogBreedMax),
+  "trainingType": zod.string().max(getGuestShareResponseSnapshotDogTrainingTypeMax),
+  "birthDate": zod.string().max(getGuestShareResponseSnapshotDogBirthDateMax),
+  "handlerName": zod.string().max(getGuestShareResponseSnapshotDogHandlerNameMax),
+  "photo": zod.string().max(getGuestShareResponseSnapshotDogPhotoMax)
+}),
+  "path": zod.object({
+  "id": zod.string().min(1).max(getGuestShareResponseSnapshotPathIdMax),
+  "name": zod.string().max(getGuestShareResponseSnapshotPathNameMax),
+  "description": zod.string().max(getGuestShareResponseSnapshotPathDescriptionMax)
+}),
+  "assignment": zod.object({
+  "id": zod.string().min(1).max(getGuestShareResponseSnapshotAssignmentIdMax),
+  "dogId": zod.string().min(1).max(getGuestShareResponseSnapshotAssignmentDogIdMax),
+  "pathId": zod.string().min(1).max(getGuestShareResponseSnapshotAssignmentPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(getGuestShareResponseSnapshotAssignmentMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(getGuestShareResponseSnapshotAssignmentMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemContentNameMax),
+  "description": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(getGuestShareResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax)
+}).optional()
+})).max(getGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax).optional()
+})).max(getGuestShareResponseSnapshotAssignmentMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
+  "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
+})
+}),
+  "entries": zod.array(zod.object({
+  "id": zod.string().min(1).max(getGuestShareResponseEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(getGuestShareResponseEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(getGuestShareResponseEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(getGuestShareResponseEntriesItemVideoPathMax),
+  "description": zod.string().max(getGuestShareResponseEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(getGuestShareResponseEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(getGuestShareResponseEntriesItemFeedbackTextMax)
+}).optional()
+})),
+  "active": zod.boolean(),
+  "revoked": zod.boolean(),
+  "revision": zod.number().int()
+})
+
+
+export const PublishGuestShareParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const publishGuestShareBodyDogIdMax = 100;
+
+export const publishGuestShareBodyDogNameMax = 150;
+
+export const publishGuestShareBodyDogBreedMax = 150;
+
+export const publishGuestShareBodyDogTrainingTypeMax = 150;
+
+export const publishGuestShareBodyDogBirthDateMax = 10;
+
+export const publishGuestShareBodyDogHandlerNameMax = 150;
+
+export const publishGuestShareBodyDogPhotoMax = 500;
+
+export const publishGuestShareBodyPathIdMax = 100;
+
+export const publishGuestShareBodyPathNameMax = 150;
+
+export const publishGuestShareBodyPathDescriptionMax = 2000;
+
+export const publishGuestShareBodyAssignmentIdMax = 100;
+
+export const publishGuestShareBodyAssignmentDogIdMax = 100;
+
+export const publishGuestShareBodyAssignmentPathIdMax = 100;
+
+export const publishGuestShareBodyAssignmentMilestonesItemIdMax = 100;
+
+export const publishGuestShareBodyAssignmentMilestonesItemTemplateIdMax = 100;
+
+export const publishGuestShareBodyAssignmentMilestonesItemContentNameMax = 150;
+
+export const publishGuestShareBodyAssignmentMilestonesItemContentDescriptionMax = 1000;
+
+export const publishGuestShareBodyAssignmentMilestonesItemContentCommandMax = 500;
+
+export const publishGuestShareBodyAssignmentMilestonesItemContentHandSignalMax = 2000;
+
+export const publishGuestShareBodyAssignmentMilestonesItemContentInstructionsMax = 12000;
+
+export const publishGuestShareBodyAssignmentMilestonesItemContentCategoryMax = 100;
+
+export const publishGuestShareBodyAssignmentMilestonesItemContentVideoPathMax = 500;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeVideoPathMax = 500;
+
+export const publishGuestShareBodyAssignmentMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesMax = 200;
+
+export const publishGuestShareBodyAssignmentMilestonesMax = 200;
+
+
+
+export const PublishGuestShareBody = zod.object({
+  "dog": zod.object({
+  "id": zod.string().min(1).max(publishGuestShareBodyDogIdMax),
+  "name": zod.string().min(1).max(publishGuestShareBodyDogNameMax),
+  "breed": zod.string().max(publishGuestShareBodyDogBreedMax),
+  "trainingType": zod.string().max(publishGuestShareBodyDogTrainingTypeMax),
+  "birthDate": zod.string().max(publishGuestShareBodyDogBirthDateMax),
+  "handlerName": zod.string().max(publishGuestShareBodyDogHandlerNameMax),
+  "photo": zod.string().max(publishGuestShareBodyDogPhotoMax)
+}),
+  "path": zod.object({
+  "id": zod.string().min(1).max(publishGuestShareBodyPathIdMax),
+  "name": zod.string().max(publishGuestShareBodyPathNameMax),
+  "description": zod.string().max(publishGuestShareBodyPathDescriptionMax)
+}),
+  "assignment": zod.object({
+  "id": zod.string().min(1).max(publishGuestShareBodyAssignmentIdMax),
+  "dogId": zod.string().min(1).max(publishGuestShareBodyAssignmentDogIdMax),
+  "pathId": zod.string().min(1).max(publishGuestShareBodyAssignmentPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(publishGuestShareBodyAssignmentMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(publishGuestShareBodyAssignmentMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemContentNameMax),
+  "description": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(publishGuestShareBodyAssignmentMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax)
+}).optional()
+})).max(publishGuestShareBodyAssignmentMilestonesItemPracticeEntriesMax).optional()
+})).max(publishGuestShareBodyAssignmentMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
+  "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
+})
+})
+
+export const publishGuestShareResponseSnapshotDogIdMax = 100;
+
+export const publishGuestShareResponseSnapshotDogNameMax = 150;
+
+export const publishGuestShareResponseSnapshotDogBreedMax = 150;
+
+export const publishGuestShareResponseSnapshotDogTrainingTypeMax = 150;
+
+export const publishGuestShareResponseSnapshotDogBirthDateMax = 10;
+
+export const publishGuestShareResponseSnapshotDogHandlerNameMax = 150;
+
+export const publishGuestShareResponseSnapshotDogPhotoMax = 500;
+
+export const publishGuestShareResponseSnapshotPathIdMax = 100;
+
+export const publishGuestShareResponseSnapshotPathNameMax = 150;
+
+export const publishGuestShareResponseSnapshotPathDescriptionMax = 2000;
+
+export const publishGuestShareResponseSnapshotAssignmentIdMax = 100;
+
+export const publishGuestShareResponseSnapshotAssignmentDogIdMax = 100;
+
+export const publishGuestShareResponseSnapshotAssignmentPathIdMax = 100;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemIdMax = 100;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemTemplateIdMax = 100;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemContentNameMax = 150;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemContentDescriptionMax = 1000;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemContentCommandMax = 500;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemContentHandSignalMax = 2000;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemContentInstructionsMax = 12000;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemContentCategoryMax = 100;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemContentVideoPathMax = 500;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax = 500;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax = 200;
+
+export const publishGuestShareResponseSnapshotAssignmentMilestonesMax = 200;
+
+export const publishGuestShareResponseEntriesItemIdMax = 100;
+
+export const publishGuestShareResponseEntriesItemMilestoneIdMax = 100;
+
+export const publishGuestShareResponseEntriesItemCreatedAtMax = 50;
+
+export const publishGuestShareResponseEntriesItemVideoPathMax = 500;
+
+export const publishGuestShareResponseEntriesItemDescriptionMax = 4000;
+
+export const publishGuestShareResponseEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const publishGuestShareResponseEntriesItemFeedbackTextMax = 10000;
+
+
+
+export const PublishGuestShareResponse = zod.object({
+  "id": zod.string(),
+  "snapshot": zod.object({
+  "dog": zod.object({
+  "id": zod.string().min(1).max(publishGuestShareResponseSnapshotDogIdMax),
+  "name": zod.string().min(1).max(publishGuestShareResponseSnapshotDogNameMax),
+  "breed": zod.string().max(publishGuestShareResponseSnapshotDogBreedMax),
+  "trainingType": zod.string().max(publishGuestShareResponseSnapshotDogTrainingTypeMax),
+  "birthDate": zod.string().max(publishGuestShareResponseSnapshotDogBirthDateMax),
+  "handlerName": zod.string().max(publishGuestShareResponseSnapshotDogHandlerNameMax),
+  "photo": zod.string().max(publishGuestShareResponseSnapshotDogPhotoMax)
+}),
+  "path": zod.object({
+  "id": zod.string().min(1).max(publishGuestShareResponseSnapshotPathIdMax),
+  "name": zod.string().max(publishGuestShareResponseSnapshotPathNameMax),
+  "description": zod.string().max(publishGuestShareResponseSnapshotPathDescriptionMax)
+}),
+  "assignment": zod.object({
+  "id": zod.string().min(1).max(publishGuestShareResponseSnapshotAssignmentIdMax),
+  "dogId": zod.string().min(1).max(publishGuestShareResponseSnapshotAssignmentDogIdMax),
+  "pathId": zod.string().min(1).max(publishGuestShareResponseSnapshotAssignmentPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(publishGuestShareResponseSnapshotAssignmentMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(publishGuestShareResponseSnapshotAssignmentMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemContentNameMax),
+  "description": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(publishGuestShareResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax)
+}).optional()
+})).max(publishGuestShareResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax).optional()
+})).max(publishGuestShareResponseSnapshotAssignmentMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
+  "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
+})
+}),
+  "entries": zod.array(zod.object({
+  "id": zod.string().min(1).max(publishGuestShareResponseEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(publishGuestShareResponseEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(publishGuestShareResponseEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(publishGuestShareResponseEntriesItemVideoPathMax),
+  "description": zod.string().max(publishGuestShareResponseEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(publishGuestShareResponseEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(publishGuestShareResponseEntriesItemFeedbackTextMax)
+}).optional()
+})),
+  "active": zod.boolean(),
+  "revoked": zod.boolean(),
+  "revision": zod.number().int()
+})
+
+
+export const RevokeGuestShareParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const RevokeGuestShareResponse = zod.void()
+
+
+export const RequestGuestUploadParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const requestGuestUploadBodyNameMax = 250;
+
+export const requestGuestUploadBodySizeMax = 52428800;
+
+
+
+export const RequestGuestUploadBody = zod.object({
+  "name": zod.string().max(requestGuestUploadBodyNameMax),
+  "size": zod.number().int().min(1).max(requestGuestUploadBodySizeMax),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm', 'video/quicktime'])
+})
+
+export const RequestGuestUploadResponse = zod.object({
+  "mediaId": zod.string(),
+  "uploadURL": zod.string(),
+  "videoPath": zod.string()
+})
+
+
+export const ConfirmGuestUploadParams = zod.object({
+  "id": zod.coerce.string(),
+  "mediaId": zod.coerce.string()
+})
+
+export const ConfirmGuestUploadResponse = zod.void()
+
+
+export const GetGuestMediaParams = zod.object({
+  "id": zod.coerce.string(),
+  "mediaId": zod.coerce.string()
+})
+
+export const GetGuestMediaResponse = zod.unknown()
+
+
+export const SubmitGuestPracticeParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const submitGuestPracticeBodyIdMax = 100;
+
+export const submitGuestPracticeBodyMilestoneIdMax = 100;
+
+export const submitGuestPracticeBodyCreatedAtMax = 50;
+
+export const submitGuestPracticeBodyVideoPathMax = 500;
+
+export const submitGuestPracticeBodyDescriptionMax = 4000;
+
+export const submitGuestPracticeBodyFeedbackOriginalDescriptionMax = 4000;
+
+export const submitGuestPracticeBodyFeedbackTextMax = 10000;
+
+
+
+export const SubmitGuestPracticeBody = zod.object({
+  "id": zod.string().min(1).max(submitGuestPracticeBodyIdMax),
+  "milestoneId": zod.string().min(1).max(submitGuestPracticeBodyMilestoneIdMax),
+  "createdAt": zod.string().max(submitGuestPracticeBodyCreatedAtMax),
+  "videoPath": zod.string().max(submitGuestPracticeBodyVideoPathMax),
+  "description": zod.string().max(submitGuestPracticeBodyDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(submitGuestPracticeBodyFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(submitGuestPracticeBodyFeedbackTextMax)
+}).optional()
+})
+
+export const submitGuestPracticeResponseSnapshotDogIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotDogNameMax = 150;
+
+export const submitGuestPracticeResponseSnapshotDogBreedMax = 150;
+
+export const submitGuestPracticeResponseSnapshotDogTrainingTypeMax = 150;
+
+export const submitGuestPracticeResponseSnapshotDogBirthDateMax = 10;
+
+export const submitGuestPracticeResponseSnapshotDogHandlerNameMax = 150;
+
+export const submitGuestPracticeResponseSnapshotDogPhotoMax = 500;
+
+export const submitGuestPracticeResponseSnapshotPathIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotPathNameMax = 150;
+
+export const submitGuestPracticeResponseSnapshotPathDescriptionMax = 2000;
+
+export const submitGuestPracticeResponseSnapshotAssignmentIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotAssignmentDogIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotAssignmentPathIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemTemplateIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentNameMax = 150;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentDescriptionMax = 1000;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentCommandMax = 500;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentHandSignalMax = 2000;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentInstructionsMax = 12000;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentCategoryMax = 100;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentVideoPathMax = 500;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax = 500;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax = 200;
+
+export const submitGuestPracticeResponseSnapshotAssignmentMilestonesMax = 200;
+
+export const submitGuestPracticeResponseEntriesItemIdMax = 100;
+
+export const submitGuestPracticeResponseEntriesItemMilestoneIdMax = 100;
+
+export const submitGuestPracticeResponseEntriesItemCreatedAtMax = 50;
+
+export const submitGuestPracticeResponseEntriesItemVideoPathMax = 500;
+
+export const submitGuestPracticeResponseEntriesItemDescriptionMax = 4000;
+
+export const submitGuestPracticeResponseEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const submitGuestPracticeResponseEntriesItemFeedbackTextMax = 10000;
+
+
+
+export const SubmitGuestPracticeResponse = zod.object({
+  "id": zod.string(),
+  "snapshot": zod.object({
+  "dog": zod.object({
+  "id": zod.string().min(1).max(submitGuestPracticeResponseSnapshotDogIdMax),
+  "name": zod.string().min(1).max(submitGuestPracticeResponseSnapshotDogNameMax),
+  "breed": zod.string().max(submitGuestPracticeResponseSnapshotDogBreedMax),
+  "trainingType": zod.string().max(submitGuestPracticeResponseSnapshotDogTrainingTypeMax),
+  "birthDate": zod.string().max(submitGuestPracticeResponseSnapshotDogBirthDateMax),
+  "handlerName": zod.string().max(submitGuestPracticeResponseSnapshotDogHandlerNameMax),
+  "photo": zod.string().max(submitGuestPracticeResponseSnapshotDogPhotoMax)
+}),
+  "path": zod.object({
+  "id": zod.string().min(1).max(submitGuestPracticeResponseSnapshotPathIdMax),
+  "name": zod.string().max(submitGuestPracticeResponseSnapshotPathNameMax),
+  "description": zod.string().max(submitGuestPracticeResponseSnapshotPathDescriptionMax)
+}),
+  "assignment": zod.object({
+  "id": zod.string().min(1).max(submitGuestPracticeResponseSnapshotAssignmentIdMax),
+  "dogId": zod.string().min(1).max(submitGuestPracticeResponseSnapshotAssignmentDogIdMax),
+  "pathId": zod.string().min(1).max(submitGuestPracticeResponseSnapshotAssignmentPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentNameMax),
+  "description": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax)
+}).optional()
+})).max(submitGuestPracticeResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax).optional()
+})).max(submitGuestPracticeResponseSnapshotAssignmentMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
+  "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
+})
+}),
+  "entries": zod.array(zod.object({
+  "id": zod.string().min(1).max(submitGuestPracticeResponseEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(submitGuestPracticeResponseEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(submitGuestPracticeResponseEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(submitGuestPracticeResponseEntriesItemVideoPathMax),
+  "description": zod.string().max(submitGuestPracticeResponseEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(submitGuestPracticeResponseEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(submitGuestPracticeResponseEntriesItemFeedbackTextMax)
+}).optional()
+})),
+  "active": zod.boolean(),
+  "revoked": zod.boolean(),
+  "revision": zod.number().int()
+})
+
+
+export const SaveGuestPracticeNoteParams = zod.object({
+  "id": zod.coerce.string(),
+  "entryId": zod.coerce.string()
+})
+
+export const saveGuestPracticeNoteBodyDescriptionMax = 4000;
+
+export const saveGuestPracticeNoteBodyTextMax = 10000;
+
+
+
+export const SaveGuestPracticeNoteBody = zod.object({
+  "description": zod.string().max(saveGuestPracticeNoteBodyDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(saveGuestPracticeNoteBodyTextMax)
+})
+
+export const saveGuestPracticeNoteResponseSnapshotDogIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotDogNameMax = 150;
+
+export const saveGuestPracticeNoteResponseSnapshotDogBreedMax = 150;
+
+export const saveGuestPracticeNoteResponseSnapshotDogTrainingTypeMax = 150;
+
+export const saveGuestPracticeNoteResponseSnapshotDogBirthDateMax = 10;
+
+export const saveGuestPracticeNoteResponseSnapshotDogHandlerNameMax = 150;
+
+export const saveGuestPracticeNoteResponseSnapshotDogPhotoMax = 500;
+
+export const saveGuestPracticeNoteResponseSnapshotPathIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotPathNameMax = 150;
+
+export const saveGuestPracticeNoteResponseSnapshotPathDescriptionMax = 2000;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentDogIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentPathIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemTemplateIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentNameMax = 150;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentDescriptionMax = 1000;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentCommandMax = 500;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentHandSignalMax = 2000;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentInstructionsMax = 12000;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentCategoryMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentVideoPathMax = 500;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax = 500;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax = 200;
+
+export const saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesMax = 200;
+
+export const saveGuestPracticeNoteResponseEntriesItemIdMax = 100;
+
+export const saveGuestPracticeNoteResponseEntriesItemMilestoneIdMax = 100;
+
+export const saveGuestPracticeNoteResponseEntriesItemCreatedAtMax = 50;
+
+export const saveGuestPracticeNoteResponseEntriesItemVideoPathMax = 500;
+
+export const saveGuestPracticeNoteResponseEntriesItemDescriptionMax = 4000;
+
+export const saveGuestPracticeNoteResponseEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const saveGuestPracticeNoteResponseEntriesItemFeedbackTextMax = 10000;
+
+
+
+export const SaveGuestPracticeNoteResponse = zod.object({
+  "id": zod.string(),
+  "snapshot": zod.object({
+  "dog": zod.object({
+  "id": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotDogIdMax),
+  "name": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotDogNameMax),
+  "breed": zod.string().max(saveGuestPracticeNoteResponseSnapshotDogBreedMax),
+  "trainingType": zod.string().max(saveGuestPracticeNoteResponseSnapshotDogTrainingTypeMax),
+  "birthDate": zod.string().max(saveGuestPracticeNoteResponseSnapshotDogBirthDateMax),
+  "handlerName": zod.string().max(saveGuestPracticeNoteResponseSnapshotDogHandlerNameMax),
+  "photo": zod.string().max(saveGuestPracticeNoteResponseSnapshotDogPhotoMax)
+}),
+  "path": zod.object({
+  "id": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotPathIdMax),
+  "name": zod.string().max(saveGuestPracticeNoteResponseSnapshotPathNameMax),
+  "description": zod.string().max(saveGuestPracticeNoteResponseSnapshotPathDescriptionMax)
+}),
+  "assignment": zod.object({
+  "id": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotAssignmentIdMax),
+  "dogId": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotAssignmentDogIdMax),
+  "pathId": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotAssignmentPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentNameMax),
+  "description": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesItemFeedbackTextMax)
+}).optional()
+})).max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesItemPracticeEntriesMax).optional()
+})).max(saveGuestPracticeNoteResponseSnapshotAssignmentMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
+  "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
+})
+}),
+  "entries": zod.array(zod.object({
+  "id": zod.string().min(1).max(saveGuestPracticeNoteResponseEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(saveGuestPracticeNoteResponseEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(saveGuestPracticeNoteResponseEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(saveGuestPracticeNoteResponseEntriesItemVideoPathMax),
+  "description": zod.string().max(saveGuestPracticeNoteResponseEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(saveGuestPracticeNoteResponseEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(saveGuestPracticeNoteResponseEntriesItemFeedbackTextMax)
+}).optional()
+})),
+  "active": zod.boolean(),
+  "revoked": zod.boolean(),
+  "revision": zod.number().int()
+})
+
+
 /**
  * Returns server health status
  * @summary Health check
@@ -107,6 +1263,22 @@ export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPr
 
 export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax = 10000;
 
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesMax = 200;
+
 export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax = 200;
 
 export const getTrainingWorkspaceResponseStateOneAssignmentsMax = 1000;
@@ -177,7 +1349,21 @@ export const GetTrainingWorkspaceResponse = zod.object({
   "sampleFeedbackNote": zod.object({
   "source": zod.enum(['Simulated sample feedback']),
   "text": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackTextMax)
 }).optional()
+})).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesMax).optional()
 })).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(getTrainingWorkspaceResponseStateOneAssignmentsMax)
@@ -277,6 +1463,22 @@ export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPractice
 
 export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax = 10000;
 
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesMax = 200;
+
 export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesMax = 200;
 
 export const saveTrainingWorkspaceBodyStateAssignmentsMax = 1000;
@@ -349,7 +1551,21 @@ export const SaveTrainingWorkspaceBody = zod.object({
   "sampleFeedbackNote": zod.object({
   "source": zod.enum(['Simulated sample feedback']),
   "text": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackTextMax)
 }).optional()
+})).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeEntriesMax).optional()
 })).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(saveTrainingWorkspaceBodyStateAssignmentsMax)
@@ -447,6 +1663,22 @@ export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemP
 
 export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax = 10000;
 
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemIdMax = 100;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemMilestoneIdMax = 100;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemCreatedAtMax = 50;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemVideoPathMax = 500;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemDescriptionMax = 4000;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax = 4000;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackTextMax = 10000;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesMax = 200;
+
 export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax = 200;
 
 export const saveTrainingWorkspaceResponseStateOneAssignmentsMax = 1000;
@@ -517,7 +1749,21 @@ export const SaveTrainingWorkspaceResponse = zod.object({
   "sampleFeedbackNote": zod.object({
   "source": zod.enum(['Simulated sample feedback']),
   "text": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax)
+}).optional(),
+  "practiceEntries": zod.array(zod.object({
+  "id": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemIdMax),
+  "milestoneId": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemMilestoneIdMax),
+  "createdAt": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemCreatedAtMax),
+  "videoPath": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemVideoPathMax),
+  "description": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "feedback": zod.object({
+  "source": zod.enum(['Simulated handler-reported feedback']),
+  "originalDescription": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackOriginalDescriptionMax),
+  "outcome": zod.enum(['responded', 'prompting', 'incomplete', 'unsure']),
+  "text": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesItemFeedbackTextMax)
 }).optional()
+})).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeEntriesMax).optional()
 })).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(saveTrainingWorkspaceResponseStateOneAssignmentsMax)

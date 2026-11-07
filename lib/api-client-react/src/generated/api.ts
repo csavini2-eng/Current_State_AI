@@ -20,12 +20,18 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  GuestCredentials,
+  GuestSnapshot,
+  GuestUploadTicket,
+  GuestView,
   HandlerPath,
   HandlerShare,
   HandlerShareInput,
   HealthStatus,
   MediaInput,
   MediaResult,
+  PracticeEntry,
+  PracticeNoteInput,
   UploadInput,
   UploadTicket,
   WorkspaceInput,
@@ -58,6 +64,778 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getBeginGuestShareUrl = () => {
+
+
+
+
+  return `/api/guest-sharing`
+}
+
+export const beginGuestShare = async (guestSnapshot: GuestSnapshot, options?: Parameters<typeof customFetch>[1]): Promise<GuestCredentials> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<GuestCredentials>(getBeginGuestShareUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(guestSnapshot)
+  }
+);}
+
+
+
+
+
+export const getBeginGuestShareMutationKey = () => ['beginGuestShare'] as const;
+
+export const getBeginGuestShareMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof beginGuestShare>>, TError,BeginGuestShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof beginGuestShare>>, TError,BeginGuestShareMutationVariables, TContext> => {
+
+const mutationKey = getBeginGuestShareMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof beginGuestShare>>, BeginGuestShareMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  beginGuestShare(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BeginGuestShareMutationResult = NonNullable<Awaited<ReturnType<typeof beginGuestShare>>>
+    export type BeginGuestShareMutationBody = BodyType<GuestSnapshot>
+    export type BeginGuestShareMutationError = ErrorType<unknown>
+    export type BeginGuestShareMutationVariables = {data: BodyType<GuestSnapshot>}
+
+    export const useBeginGuestShare = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof beginGuestShare>>, TError,BeginGuestShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof beginGuestShare>>,
+        TError,
+        BeginGuestShareMutationVariables,
+        TContext
+      > => {
+      return useMutation(getBeginGuestShareMutationOptions(options));
+    }
+
+export const getResolveGuestShareUrl = () => {
+
+
+
+
+  return `/api/guest-sharing/resolve`
+}
+
+export const resolveGuestShare = async ( options?: Parameters<typeof customFetch>[1]): Promise<GuestView> => {
+
+  return customFetch<GuestView>(getResolveGuestShareUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getResolveGuestShareQueryKey = () => {
+    return [
+    `/api/guest-sharing/resolve`
+    ] as const;
+    }
+
+
+export const getResolveGuestShareQueryOptions = <TData = Awaited<ReturnType<typeof resolveGuestShare>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof resolveGuestShare>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getResolveGuestShareQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof resolveGuestShare>>> = ({ signal }) => resolveGuestShare({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof resolveGuestShare>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ResolveGuestShareQueryResult = NonNullable<Awaited<ReturnType<typeof resolveGuestShare>>>
+export type ResolveGuestShareQueryError = ErrorType<unknown>
+
+
+
+export function useResolveGuestShare<TData = Awaited<ReturnType<typeof resolveGuestShare>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof resolveGuestShare>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getResolveGuestShareQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetGuestShareUrl = (id: string,) => {
+
+
+
+
+  return `/api/guest-sharing/${id}`
+}
+
+export const getGuestShare = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<GuestView> => {
+
+  return customFetch<GuestView>(getGetGuestShareUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetGuestShareQueryKey = (id: string,) => {
+    return [
+    `/api/guest-sharing/${id}`
+    ] as const;
+    }
+
+
+export const getGetGuestShareQueryOptions = <TData = Awaited<ReturnType<typeof getGuestShare>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGuestShare>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetGuestShareQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGuestShare>>> = ({ signal }) => getGuestShare(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGuestShare>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetGuestShareQueryResult = NonNullable<Awaited<ReturnType<typeof getGuestShare>>>
+export type GetGuestShareQueryError = ErrorType<unknown>
+
+
+
+export function useGetGuestShare<TData = Awaited<ReturnType<typeof getGuestShare>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGuestShare>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetGuestShareQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPublishGuestShareUrl = (id: string,) => {
+
+
+
+
+  return `/api/guest-sharing/${id}`
+}
+
+export const publishGuestShare = async (id: string,
+    guestSnapshot: GuestSnapshot, options?: Parameters<typeof customFetch>[1]): Promise<GuestView> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<GuestView>(getPublishGuestShareUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(guestSnapshot)
+  }
+);}
+
+
+
+
+
+export const getPublishGuestShareMutationKey = () => ['publishGuestShare'] as const;
+
+export const getPublishGuestShareMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishGuestShare>>, TError,PublishGuestShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishGuestShare>>, TError,PublishGuestShareMutationVariables, TContext> => {
+
+const mutationKey = getPublishGuestShareMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishGuestShare>>, PublishGuestShareMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  publishGuestShare(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PublishGuestShareMutationResult = NonNullable<Awaited<ReturnType<typeof publishGuestShare>>>
+    export type PublishGuestShareMutationBody = BodyType<GuestSnapshot>
+    export type PublishGuestShareMutationError = ErrorType<unknown>
+    export type PublishGuestShareMutationVariables = {id: string;data: BodyType<GuestSnapshot>}
+
+    export const usePublishGuestShare = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishGuestShare>>, TError,PublishGuestShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof publishGuestShare>>,
+        TError,
+        PublishGuestShareMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPublishGuestShareMutationOptions(options));
+    }
+
+export const getRevokeGuestShareUrl = (id: string,) => {
+
+
+
+
+  return `/api/guest-sharing/${id}`
+}
+
+export const revokeGuestShare = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getRevokeGuestShareUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getRevokeGuestShareMutationKey = () => ['revokeGuestShare'] as const;
+
+export const getRevokeGuestShareMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeGuestShare>>, TError,RevokeGuestShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof revokeGuestShare>>, TError,RevokeGuestShareMutationVariables, TContext> => {
+
+const mutationKey = getRevokeGuestShareMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeGuestShare>>, RevokeGuestShareMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  revokeGuestShare(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeGuestShareMutationResult = NonNullable<Awaited<ReturnType<typeof revokeGuestShare>>>
+
+    export type RevokeGuestShareMutationError = ErrorType<unknown>
+    export type RevokeGuestShareMutationVariables = {id: string}
+
+    export const useRevokeGuestShare = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeGuestShare>>, TError,RevokeGuestShareMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof revokeGuestShare>>,
+        TError,
+        RevokeGuestShareMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRevokeGuestShareMutationOptions(options));
+    }
+
+export const getRequestGuestUploadUrl = (id: string,) => {
+
+
+
+
+  return `/api/guest-sharing/${id}/uploads`
+}
+
+export const requestGuestUpload = async (id: string,
+    uploadInput: UploadInput, options?: Parameters<typeof customFetch>[1]): Promise<GuestUploadTicket> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<GuestUploadTicket>(getRequestGuestUploadUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(uploadInput)
+  }
+);}
+
+
+
+
+
+export const getRequestGuestUploadMutationKey = () => ['requestGuestUpload'] as const;
+
+export const getRequestGuestUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestGuestUpload>>, TError,RequestGuestUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestGuestUpload>>, TError,RequestGuestUploadMutationVariables, TContext> => {
+
+const mutationKey = getRequestGuestUploadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestGuestUpload>>, RequestGuestUploadMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  requestGuestUpload(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestGuestUploadMutationResult = NonNullable<Awaited<ReturnType<typeof requestGuestUpload>>>
+    export type RequestGuestUploadMutationBody = BodyType<UploadInput>
+    export type RequestGuestUploadMutationError = ErrorType<unknown>
+    export type RequestGuestUploadMutationVariables = {id: string;data: BodyType<UploadInput>}
+
+    export const useRequestGuestUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestGuestUpload>>, TError,RequestGuestUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestGuestUpload>>,
+        TError,
+        RequestGuestUploadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRequestGuestUploadMutationOptions(options));
+    }
+
+export const getConfirmGuestUploadUrl = (id: string,
+    mediaId: string,) => {
+
+
+
+
+  return `/api/guest-sharing/${id}/uploads/${mediaId}`
+}
+
+export const confirmGuestUpload = async (id: string,
+    mediaId: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getConfirmGuestUploadUrl(id,mediaId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getConfirmGuestUploadMutationKey = () => ['confirmGuestUpload'] as const;
+
+export const getConfirmGuestUploadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmGuestUpload>>, TError,ConfirmGuestUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmGuestUpload>>, TError,ConfirmGuestUploadMutationVariables, TContext> => {
+
+const mutationKey = getConfirmGuestUploadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmGuestUpload>>, ConfirmGuestUploadMutationVariables> = (props) => {
+          const {id,mediaId} = props ?? {};
+
+          return  confirmGuestUpload(id,mediaId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmGuestUploadMutationResult = NonNullable<Awaited<ReturnType<typeof confirmGuestUpload>>>
+
+    export type ConfirmGuestUploadMutationError = ErrorType<unknown>
+    export type ConfirmGuestUploadMutationVariables = {id: string;mediaId: string}
+
+    export const useConfirmGuestUpload = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmGuestUpload>>, TError,ConfirmGuestUploadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof confirmGuestUpload>>,
+        TError,
+        ConfirmGuestUploadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getConfirmGuestUploadMutationOptions(options));
+    }
+
+export const getGetGuestMediaUrl = (id: string,
+    mediaId: string,) => {
+
+
+
+
+  return `/api/guest-sharing/${id}/media/${mediaId}`
+}
+
+export const getGuestMedia = async (id: string,
+    mediaId: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetGuestMediaUrl(id,mediaId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetGuestMediaQueryKey = (id: string,
+    mediaId: string,) => {
+    return [
+    `/api/guest-sharing/${id}/media/${mediaId}`
+    ] as const;
+    }
+
+
+export const getGetGuestMediaQueryOptions = <TData = Awaited<ReturnType<typeof getGuestMedia>>, TError = ErrorType<unknown>>(id: string,
+    mediaId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGuestMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetGuestMediaQueryKey(id,mediaId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGuestMedia>>> = ({ signal }) => getGuestMedia(id,mediaId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && mediaId !== null && mediaId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGuestMedia>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetGuestMediaQueryResult = NonNullable<Awaited<ReturnType<typeof getGuestMedia>>>
+export type GetGuestMediaQueryError = ErrorType<unknown>
+
+
+
+export function useGetGuestMedia<TData = Awaited<ReturnType<typeof getGuestMedia>>, TError = ErrorType<unknown>>(
+ id: string,
+    mediaId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGuestMedia>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetGuestMediaQueryOptions(id,mediaId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSubmitGuestPracticeUrl = (id: string,) => {
+
+
+
+
+  return `/api/guest-sharing/${id}/entries`
+}
+
+export const submitGuestPractice = async (id: string,
+    practiceEntry: PracticeEntry, options?: Parameters<typeof customFetch>[1]): Promise<GuestView> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<GuestView>(getSubmitGuestPracticeUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(practiceEntry)
+  }
+);}
+
+
+
+
+
+export const getSubmitGuestPracticeMutationKey = () => ['submitGuestPractice'] as const;
+
+export const getSubmitGuestPracticeMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitGuestPractice>>, TError,SubmitGuestPracticeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitGuestPractice>>, TError,SubmitGuestPracticeMutationVariables, TContext> => {
+
+const mutationKey = getSubmitGuestPracticeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitGuestPractice>>, SubmitGuestPracticeMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  submitGuestPractice(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitGuestPracticeMutationResult = NonNullable<Awaited<ReturnType<typeof submitGuestPractice>>>
+    export type SubmitGuestPracticeMutationBody = BodyType<PracticeEntry>
+    export type SubmitGuestPracticeMutationError = ErrorType<unknown>
+    export type SubmitGuestPracticeMutationVariables = {id: string;data: BodyType<PracticeEntry>}
+
+    export const useSubmitGuestPractice = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitGuestPractice>>, TError,SubmitGuestPracticeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitGuestPractice>>,
+        TError,
+        SubmitGuestPracticeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSubmitGuestPracticeMutationOptions(options));
+    }
+
+export const getSaveGuestPracticeNoteUrl = (id: string,
+    entryId: string,) => {
+
+
+
+
+  return `/api/guest-sharing/${id}/entries/${entryId}/note`
+}
+
+export const saveGuestPracticeNote = async (id: string,
+    entryId: string,
+    practiceNoteInput: PracticeNoteInput, options?: Parameters<typeof customFetch>[1]): Promise<GuestView> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<GuestView>(getSaveGuestPracticeNoteUrl(id,entryId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(practiceNoteInput)
+  }
+);}
+
+
+
+
+
+export const getSaveGuestPracticeNoteMutationKey = () => ['saveGuestPracticeNote'] as const;
+
+export const getSaveGuestPracticeNoteMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveGuestPracticeNote>>, TError,SaveGuestPracticeNoteMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveGuestPracticeNote>>, TError,SaveGuestPracticeNoteMutationVariables, TContext> => {
+
+const mutationKey = getSaveGuestPracticeNoteMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveGuestPracticeNote>>, SaveGuestPracticeNoteMutationVariables> = (props) => {
+          const {id,entryId,data} = props ?? {};
+
+          return  saveGuestPracticeNote(id,entryId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveGuestPracticeNoteMutationResult = NonNullable<Awaited<ReturnType<typeof saveGuestPracticeNote>>>
+    export type SaveGuestPracticeNoteMutationBody = BodyType<PracticeNoteInput>
+    export type SaveGuestPracticeNoteMutationError = ErrorType<unknown>
+    export type SaveGuestPracticeNoteMutationVariables = {id: string;entryId: string;data: BodyType<PracticeNoteInput>}
+
+    export const useSaveGuestPracticeNote = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveGuestPracticeNote>>, TError,SaveGuestPracticeNoteMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveGuestPracticeNote>>,
+        TError,
+        SaveGuestPracticeNoteMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveGuestPracticeNoteMutationOptions(options));
+    }
 
 export const getHealthCheckUrl = () => {
 

@@ -11,6 +11,126 @@ tags:
   - name: health
     description: Health operations
 paths:
+  /guest-sharing:
+    post:
+      operationId: beginGuestShare
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/GuestSnapshot" }
+      responses:
+        "201":
+          description: Draft capabilities, not yet shared
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuestCredentials" }
+  /guest-sharing/resolve:
+    get:
+      operationId: resolveGuestShare
+      responses:
+        "200":
+          description: Assignment accessible to the bearer capability
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuestView" }
+  /guest-sharing/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getGuestShare
+      responses:
+        "200":
+          description: Current shared assignment and practice history
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuestView" }
+    put:
+      operationId: publishGuestShare
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/GuestSnapshot" }
+      responses:
+        "200":
+          description: Validated snapshot published
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuestView" }
+    delete:
+      operationId: revokeGuestShare
+      responses:
+        "204": { description: Handler capability revoked }
+  /guest-sharing/{id}/uploads:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: requestGuestUpload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadInput" }
+      responses:
+        "200":
+          description: Bounded upload ticket for this assignment
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuestUploadTicket" }
+  /guest-sharing/{id}/uploads/{mediaId}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+      - { name: mediaId, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: confirmGuestUpload
+      responses:
+        "204": { description: "Size, type and signature verified" }
+  /guest-sharing/{id}/media/{mediaId}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+      - { name: mediaId, in: path, required: true, schema: { type: string } }
+    get:
+      operationId: getGuestMedia
+      responses:
+        "200":
+          description: Capability-protected media
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+  /guest-sharing/{id}/entries:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    post:
+      operationId: submitGuestPractice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PracticeEntry" }
+      responses:
+        "200":
+          description: Practice entry appended idempotently
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuestView" }
+  /guest-sharing/{id}/entries/{entryId}/note:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+      - { name: entryId, in: path, required: true, schema: { type: string } }
+    put:
+      operationId: saveGuestPracticeNote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PracticeNoteInput" }
+      responses:
+        "200":
+          description: Note saved without changing instructions or progress
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuestView" }
   /healthz:
     get:
       operationId: healthCheck
@@ -120,6 +240,74 @@ paths:
               schema: { $ref: "#/components/schemas/MediaResult" }
 components:
   schemas:
+    PracticeOutcome:
+      type: string
+      enum: [responded, prompting, incomplete, unsure]
+    PracticeFeedback:
+      type: object
+      required: [source, originalDescription, outcome, text]
+      properties:
+        source: { type: string, enum: [Simulated handler-reported feedback] }
+        originalDescription: { type: string, maxLength: 4000 }
+        outcome: { $ref: "#/components/schemas/PracticeOutcome" }
+        text: { type: string, maxLength: 10000 }
+    PracticeEntry:
+      type: object
+      required: [id, milestoneId, createdAt, videoPath, description, outcome]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        milestoneId: { type: string, minLength: 1, maxLength: 100 }
+        createdAt: { type: string, maxLength: 50 }
+        videoPath: { type: string, maxLength: 500 }
+        description: { type: string, maxLength: 4000 }
+        outcome: { $ref: "#/components/schemas/PracticeOutcome" }
+        feedback: { $ref: "#/components/schemas/PracticeFeedback" }
+    PracticeNoteInput:
+      type: object
+      required: [description, outcome, text]
+      properties:
+        description: { type: string, maxLength: 4000 }
+        outcome: { $ref: "#/components/schemas/PracticeOutcome" }
+        text: { type: string, maxLength: 10000 }
+    GuestSnapshot:
+      type: object
+      required: [dog, path, assignment]
+      properties:
+        dog: { $ref: "#/components/schemas/DogProfile" }
+        path:
+          type: object
+          required: [id, name, description]
+          properties:
+            id: { type: string, minLength: 1, maxLength: 100 }
+            name: { type: string, maxLength: 150 }
+            description: { type: string, maxLength: 2000 }
+        assignment: { $ref: "#/components/schemas/DogAssignment" }
+    GuestCredentials:
+      type: object
+      required: [id, managementToken, handlerToken]
+      properties:
+        id: { type: string }
+        managementToken: { type: string }
+        handlerToken: { type: string }
+    GuestView:
+      type: object
+      required: [id, snapshot, entries, active, revoked, revision]
+      properties:
+        id: { type: string }
+        snapshot: { $ref: "#/components/schemas/GuestSnapshot" }
+        entries:
+          type: array
+          items: { $ref: "#/components/schemas/PracticeEntry" }
+        active: { type: boolean }
+        revoked: { type: boolean }
+        revision: { type: integer }
+    GuestUploadTicket:
+      type: object
+      required: [mediaId, uploadURL, videoPath]
+      properties:
+        mediaId: { type: string }
+        uploadURL: { type: string }
+        videoPath: { type: string }
     HealthStatus:
       type: object
       properties:
@@ -196,6 +384,10 @@ components:
         practiceVideoPath: { type: string, maxLength: 500 }
         sampleFeedbackNote:
           $ref: "#/components/schemas/SampleFeedbackNote"
+        practiceEntries:
+          type: array
+          maxItems: 200
+          items: { $ref: "#/components/schemas/PracticeEntry" }
     DogAssignment:
       type: object
       required: [id, dogId, pathId, progress]

@@ -14,7 +14,7 @@ function openDatabase(): Promise<IDBDatabase> {
     };
     request.onblocked = () => {
       settled = true;
-      reject(new Error('Another tab is blocking video storage. Close other GoodBoy tabs and try again.'));
+      reject(new Error('Another tab is blocking video storage. Close other Weenstone tabs and try again.'));
     };
     request.onerror = () => { settled = true; reject(request.error || new Error('Local video storage could not be opened.')); };
     request.onsuccess = () => {

@@ -1,105 +1,92 @@
-# GoodBoy
+# Weenstone
 
-**GoodBoy is a training journey tool that helps trainers and dog handlers follow the same plan for a service dog in training.**
+Weenstone helps dog trainers and handlers follow the same dog-specific training plan. The trainer workspace remains usable without sign-in.
 
-## What this slice lets a user do
+## Current prototype
 
-- Add a new dog (name, breed, type, handler). Saving with no name is blocked with a message.
-- Assign a training path (for example "Foundation Skills") to that dog.
-- Open the dog's journey and set each milestone to Not started, In progress, or Completed. A counter shows how many are completed.
-- Read each milestone’s completion objective and open **View instructions** for the trainer’s cue, optional hand signal, and practice instructions.
-- Edit reusable originals in the gallery, customize reusable paths in Training Paths, or edit a dog’s independent assigned version from its journey. Reading or editing instructions never marks a milestone complete.
-- Select separate demonstration and dog-practice videos, play them locally, and replace/remove each recording without affecting another dog.
+- Manage dogs, reusable gallery milestones, reusable paths, and independent dog-assigned journeys.
+- Cards have a status badge, a keyboard-accessible More menu, a quiet **View instructions** action, and one main progress action.
+- Instructions open in one scrolling dialog with **Instructions**, **Videos & practice**, and **Feedback & history** tabs.
+- Add multiple personal practice attempts without replacing earlier videos. Each attempt retains its handler report, selected outcome, editable simulated note, and source.
+- Create a real cross-device handler link for one selected assignment. Handlers can view instructions and videos and submit attempts and notes; only trainers control instructions, profiles, templates, and progress.
+- The approved Weenstone W-dog mark and palette are applied without replacing the friendly typography, rounded cards, or winding journey.
 
-## Open the prototype
+The user-supplied edited Raya portrait is the default. Explicitly uploaded dog photographs are preserved.
 
-Live app: https://good-boy-dog-training-platform.replit.app
+## Local records versus sharing
 
-Open the preview and use **Add New Dog**. The public demo has no sign-in dependency or account prompts. Records stay in this browser, do not sync across devices, and may be lost when browser data is cleared. Existing guest storage keys and records are retained.
+Unshared workspace records stay in browser localStorage and videos in IndexedDB. Existing record IDs, storage keys, workspace version, customizations, notes, and references are retained. Local video selection and playback do not require sign-in. Clearing browser data may lose these records.
 
-Local video selection and playback do not require sign-in. Video files are stored in this browser’s IndexedDB, not localStorage; only opaque references are saved with the records. They do not sync across devices. If browser video storage fails, an explicit temporary-preview option is available and does not change the saved recording.
+**Share with handler** is available from the dog profile and assigned journey:
 
-Cloud-upload and real-sharing controls are not part of this demo round. Existing private backend records, access-controlled media, and previously issued handler links remain protected; the demo never loads account workspaces or turns private videos into public files.
+1. **Create handler link** prepares a server copy of that dog, path assignment, progress, instructions, and required media.
+2. Required files upload and are checked before a new link activates. Failed uploads show errors rather than a pretend successful link.
+3. Copy or open the link on another device. Handler submissions are saved to that shared assignment.
+4. **Refresh submissions** in the trainer browser imports new attempts and notes without changing local instructions or progress.
+5. **Update shared assignment** explicitly publishes subsequent trainer changes. Local edits are not silently synchronized.
+6. **Revoke link** blocks handler reads, media access, uploads, and submissions. The management capability can still retrieve already-submitted history.
 
-## Editing scopes
+Anyone holding the handler link can view and submit to that specific assignment. The handler name is a label, not identity verification. Do not share sensitive information through these prototype links.
 
-1. **Gallery milestone:** the reusable source, edited only in Milestone Gallery.
-2. **Reusable-path milestone:** that path’s customization, edited from Training Paths.
-3. **Dog-assigned milestone:** independent content copied when the path is assigned. Dog-journey actions change only that assignment, including its added steps, order, demonstration references, progress, and practice videos.
+Management and handler capabilities are different random secrets; only their hashes are stored on the server. Management credentials stay in a separate trainer-browser storage record, never in the handler URL or shared snapshot. Clearing that browser’s storage loses management access: this prototype has no identity-based capability recovery.
 
-Existing assignments without snapshots are migrated from their currently resolved content. IDs, progress, customizations, and video references are preserved; existing snapshots are never rebuilt from later template/path changes. The storage key and workspace version remain unchanged.
+Private account workspaces, existing private media, and older read-only `/handler/...` links keep their existing authentication/access checks. Guest sharing uses separate records and endpoints and does not load or expose an account workspace.
 
-Demonstration videos show the trainer’s reference method. Practice videos belong to a particular dog’s assigned milestone. Selecting a practice video does not analyze it; automated feedback is not implemented.
+## Upload and storage boundaries
 
-## Sit sample and simulated feedback
+- Supported images: JPEG, PNG, WebP; videos: MP4, WebM, MOV. Browser codec support still determines playback.
+- Each file must be nonempty and at most 50 MB. The server validates declared metadata, uploaded byte count, content type, and file signature before confirmation.
+- An assignment has a 200 MB / 100-reservation lifetime upload quota, including interrupted reservations, and a 200-attempt bound.
+- Guest creation is rate-limited to five requests per hour per server-observed IP and fifty shares per day across this prototype. Forwarded IP headers are deliberately not trusted, so this is a conservative per-gateway limit behind a proxy, not a per-person allowance. Upload and entry/note endpoints have additional rate limits.
+- Every shared-assignment read, upload, and mutation requires a scoped capability; only draft creation is rate-limited without a preexisting capability. Cross-assignment media references are rejected; handlers cannot issue image uploads or trainer mutations. Media reads recheck size/type, pin the validated storage generation, and bound the stream.
+- Upload URLs expire after fifteen minutes. An already-issued URL can finish writing a private blob after revocation, but a revoked handler cannot confirm, submit, or read it. Pending/orphan storage cleanup and durable distributed abuse monitoring are future production work.
+- Shared media is fetched with authorization into short-lived browser playback URLs; it is not made public through the legacy object route.
 
-- Fresh workspaces include the supplied Sit cue, objective, and editable example instructions. Existing trainer fields are preserved. “Use sample instructions” fills only blank fields in a dog’s editor draft and still requires review and Save.
-- “Sample Sit video” is a separate bundled public asset, never a personal demonstration/practice recording. The supplied 2160×3840 footage was optimized to full-frame 720×1280 H.264, preserving its 12.84-second duration and 25fps. It has no audio; the approximately 2 MB web copy is included in production builds. The large source upload is excluded from deploys/checkpoints going forward.
-- “Try sample feedback” displays prepared observations and an explicit simulated/no-analysis disclosure. A trainer can edit, save, dismiss, edit again, or remove the one sample-note record for that assigned milestone. Saved notes retain the “Simulated sample feedback” source. No model or video-analysis service is called.
-- Other practice-video instructions offer a separate preview-only Sit sample, never observations presented as analysis of a personal recording.
-- Progress uses Start practicing, Continue practicing, Mark completed, Practice again, and a secondary reset. Text labels accompany colors. Only successfully saved new completions trigger a brief checkmark/confetti confirmation; final completion adds “Training path completed. Great teamwork!” Reduced motion suppresses effects without suppressing the confirmation.
+This is bounded prototype sharing, not a production identity, moderation, or backup system. Server rate counters are process-local; production scale requires durable abuse controls and storage lifecycle cleanup.
 
-Fresh Foundation Skills milestones have example completion objectives that trainers should tailor to each dog. Existing blank objectives are not backfilled: open the editor to review an offered example and save it explicitly. Existing cues, hand signals, instructions, and path customizations are not replaced.
+## Editing and progress
 
-## AI is not active
+Gallery originals, reusable-path customizations, and dog-assigned snapshots are separate. Assignments snapshot the resolved content once. Editing a reusable source never silently changes an existing dog’s plan.
 
-No AI-analysis controls or confirmations are shown in this demo. No real model is connected.
+All dog-journey edits, moves, removals, notes, demonstrations, and progress changes affect only that assignment. Progress belongs to the assigned step, not the gallery original. Viewing instructions, watching recordings, and saving feedback never change progress.
 
-The planned behavior: the handler (the dog owner, not the trainer) uploads a training video. The AI tells them what they are doing right and what to improve. It also gives suggestions, such as flagging when a milestone is taking longer than usual.
+Only a successfully saved new completion triggers the existing checkmark/confetti message; completing the final assigned step adds “Training path completed. Great teamwork!” Reloads and failed saves do not replay it. Reduced motion suppresses animation without suppressing the announcement.
 
-## Earlier live-app test results
+## Simulated feedback, not video analysis
 
-These three tests were recorded before the current demo update; they are not a claim that the updated build was tested in production.
+No model or video-analysis service is connected. Personal feedback is generated by the documented deterministic rules in `lib/api-zod/src/simulation.ts`:
 
-| Test | Input | Expected | Result |
-| --- | --- | --- | --- |
-| Typical | Add dog "Biscuit" (Labrador, Service dog in training, handler Maria), assign the Foundation Skills path, set Sit to Completed | Dog saved, journey shows 5 milestones, counter updates | Pass. The profile saved, 5 milestones showed, and the completed counter updated. |
-| Challenge | Mark Retrieve as Completed while Stay is still Not started | App handles an out-of-order milestone sensibly | Partial. It allowed the change and updated the counter, with no warning about the order. |
-| Invalid / empty | Save a new dog with an empty name | Dog is not saved and the user sees an error | Pass. "Add the dog's name." appeared and nothing was saved. |
+1. Use only the actual selected milestone’s objective, cue, instructions, and the handler’s written report/outcome.
+2. Request clarification for missing/short, unrelated, ambiguous, contradictory, or unsupported reports, or a missing trainer plan.
+3. For a supported report, produce a different consideration for Responded, Additional prompting, or Did not complete, quoting the real trainer objective/instructions and explicitly identifying the handler’s report.
+4. Never inspect the recording or filename, invent timings/repetitions/observations, certify success, or change progress.
 
-## Known limitations
+The personal-feedback area displays this disclosure once:
 
-1. Demo records are browser-local, with no cross-device sync or automatic backup.
-2. There is no video analysis, cloud video upload, or real sharing control in the guest demo. Browser-stored videos may be lost if browser data is cleared or the browser removes local storage.
-3. Trainers must supply missing cues and practice instructions; the app does not invent them or enforce milestone order. Foundation Skills objectives and Raya are sample data.
+> Prototype: simulated AI feedback. This note is based on the selected skill and your description. The video has not been automatically analyzed. Review suggestions against your trainer’s instructions.
 
-## Local checks
+Saved notes retain **Simulated handler-reported feedback**, the original report, and outcome even when their editable note text is removed. The bundled, silent portrait Sit sample and its prepared sample feedback remain separately labeled and optional; they are not personal recordings or live analysis.
+
+## Run and checks
+
+Open the managed **Weenstone** preview. Internal artifact/package names intentionally remain unchanged.
 
 ```sh
 pnpm run typecheck
 pnpm --filter @workspace/goodboy-training run test
 PORT=22351 BASE_PATH=/ pnpm --filter @workspace/goodboy-training run build
+# Running development frontend and API required:
+node artifacts/api-server/src/guest-sharing.test.mjs
 ```
 
-## Previous instruction-dialog verification
+The shared contract is `lib/api-spec/openapi.yaml`; regenerate clients/validators with `pnpm --filter @workspace/api-spec run codegen`. Database additions are additive guest-sharing tables, not replacements for existing private tables.
 
-- Full workspace type checks passed; all 11 helper regression tests passed.
-- The production frontend build passed with authentication publishable-key variables unset. Vite still emits a nonblocking source-map warning for the existing tooltip component.
-- A signed-out browser completed: empty-name validation, dog creation, Foundation Skills assignment, instruction viewing, progress update, and reload persistence.
-- Keyboard checks confirmed Tab/Shift+Tab containment, Escape dismissal, and focus restoration to the same instruction button. The visible Close button also worked without changing progress.
-- A path-specific edit displayed all trainer-provided instruction fields and left the reusable original and progress unchanged.
-- A separate saved-record fixture retained IDs, blank objectives, existing cues/signals/instructions, completed progress, and another step’s customization. Example adoption changed only the draft until explicit Save.
-- At 390×844 the instruction dialog wrapped correctly, its Close button was accessible, and it had no horizontal overflow. The test content fit vertically; unusually long-content scrolling was not separately exercised.
-- Guest request monitoring showed no private API requests or external authentication-service traffic. Unsigned private workspace and upload requests still returned HTTP 401. Backend authorization code was not changed.
+### Verification for this update
 
-These current checks ran against the development preview, not the published production site.
-
-## Current scope and video verification
-
-- Workspace type checks pass; the production web build passes (the pre-existing tooltip sourcemap warning remains non-blocking).
-- All 16 model regression tests pass, including independent dog snapshots, additive migration, preserved IDs/progress/video references, and intentionally empty assignments.
-- One isolated browser pass verified Raya/Doug edits, gallery/path independence, dog-only additions, progress and URL selection after reload, and legacy-v2 snapshot migration.
-- Real browser-recorded WebM files played successfully before and after reload. Practice replacement/removal affected only the intended dog; other practice and demonstration clips remained playable.
-- The browser pass verified opaque references in localStorage, actual video Blobs in IndexedDB, explicit storage-failure/temporary-preview behavior, and mobile dialog scrolling plus Escape/focus restoration.
-- Unauthenticated private workspace and upload requests still return 401. No real user or production records were modified during verification. Signed-in cloud-media flows were not re-tested; no cloud-video upload feature was added.
-
-## Sit sample and progress verification
-
-- All 23 model regression tests pass, as do workspace type checks and the production build. The existing non-blocking tooltip sourcemap warning remains.
-- The supplied sample played for a fresh guest with controls, no autoplay, and full-frame `contain` styling. The built copy has no audio stream (verified with ffprobe). At 390×844, the entire paused portrait player and its controls were visible without horizontal overflow.
-- Isolated browser checks verified the exact simulated disclosure, edited-note persistence, repeated Try without duplicates, dismiss/remove/re-save behavior, and retained source attribution.
-- Existing personal demonstration/practice references remained unchanged across note edits, sample-plan saves, and progress changes. Sample fields filled only blanks after review; cancelling discarded the draft, and saving affected only Raya.
-- Doug, reusable Foundation, and the gallery stayed independent. Dog journeys offered no reusable-path switch; Training Paths still opened the reusable editor.
-- A deliberately failed storage write preserved In progress and its counter and showed no celebration. Successful completion updated counts and announced the required text; reload did not replay it. Practice again and reset worked.
-- Reduced-motion keyboard completion produced the final 5-of-5 message without animation/confetti or scrolling. Escape restored focus. Non-Sit sample previews explicitly described only the sample clip and did not save observations against the other skill.
-- These checks used isolated development-browser data. The published site and signed-in cloud-media flows were not re-tested.
+- Full workspace type checks and production frontend build pass. Vite reports the existing nonblocking tooltip sourcemap warning and a bundle-size advisory.
+- All 27 helper/rule regression tests pass: independent assignments, additive migration, preserved original references, progress events, sample boundaries, varied report-based feedback, clarification cases, and custom trainer plans.
+- All 48 development HTTP checks pass, covering actual App Storage upload/byte-for-byte media retrieval, interrupted-upload rejection, draft invisibility, scoped permissions, cross-assignment denial, private workspace/upload 401s, retry idempotency, retained reports/source, revoked reads/submissions, and retained trainer management of archived notes.
+- One independent trainer/handler browser pass verified real media playback, appended attempts, report/source/note persistence, trainer refresh, explicit shared updates without note loss, and revocation with no cached fallback. It also verified one-time completion persistence, keyboard menu/Escape/focus return, and reduced-motion suppression.
+- The browser pass found mobile tab visibility, horizontal tab scrolling, and intermittent dialog-background defects. After correction, a focused 390×844 check passed: exactly one matching panel, no horizontal scroller, one vertical modal-body scroll owner, retained unsaved report across tabs, opaque instruction/share dialogs, and Escape/focus restoration.
+- The storage SDK emitted nonblocking listener-limit warnings during media reads; byte-for-byte retrieval and browser playback still passed. Long-running production resource behavior has not been tested.
+- These checks concern the development preview. This update has not been published or verified in production; private signed-in flows were not re-tested.

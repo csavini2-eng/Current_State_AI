@@ -5,8 +5,94 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
+export type PracticeOutcome = typeof PracticeOutcome[keyof typeof PracticeOutcome];
+
+
+export const PracticeOutcome = {
+  responded: 'responded',
+  prompting: 'prompting',
+  incomplete: 'incomplete',
+  unsure: 'unsure',
+} as const;
+
+export type PracticeFeedbackSource = typeof PracticeFeedbackSource[keyof typeof PracticeFeedbackSource];
+
+
+export const PracticeFeedbackSource = {
+  'Simulated_handler-reported_feedback': 'Simulated handler-reported feedback',
+} as const;
+
+export interface PracticeFeedback {
+  source: PracticeFeedbackSource;
+  /** @maxLength 4000 */
+  originalDescription: string;
+  outcome: PracticeOutcome;
+  /** @maxLength 10000 */
+  text: string;
+}
+
+export interface PracticeEntry {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  milestoneId: string;
+  /** @maxLength 50 */
+  createdAt: string;
+  /** @maxLength 500 */
+  videoPath: string;
+  /** @maxLength 4000 */
+  description: string;
+  outcome: PracticeOutcome;
+  feedback?: PracticeFeedback;
+}
+
+export interface PracticeNoteInput {
+  /** @maxLength 4000 */
+  description: string;
+  outcome: PracticeOutcome;
+  /** @maxLength 10000 */
+  text: string;
+}
+
+export type GuestSnapshotPath = {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+  /** @maxLength 150 */
+  name: string;
+  /** @maxLength 2000 */
+  description: string;
+};
+
+export interface DogProfile {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 150
+     */
+  name: string;
+  /** @maxLength 150 */
+  breed: string;
+  /** @maxLength 150 */
+  trainingType: string;
+  /** @maxLength 10 */
+  birthDate: string;
+  /** @maxLength 150 */
+  handlerName: string;
+  /** @maxLength 500 */
+  photo: string;
 }
 
 export type MilestoneContentDifficulty = typeof MilestoneContentDifficulty[keyof typeof MilestoneContentDifficulty];
@@ -34,6 +120,98 @@ export interface MilestoneContent {
   difficulty: MilestoneContentDifficulty;
   /** @maxLength 500 */
   videoPath: string;
+}
+
+export type SampleFeedbackNoteSource = typeof SampleFeedbackNoteSource[keyof typeof SampleFeedbackNoteSource];
+
+
+export const SampleFeedbackNoteSource = {
+  Simulated_sample_feedback: 'Simulated sample feedback',
+} as const;
+
+export interface SampleFeedbackNote {
+  source: SampleFeedbackNoteSource;
+  /**
+     * @minLength 1
+     * @maxLength 10000
+     */
+  text: string;
+}
+
+export interface AssignedMilestone {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  templateId: string;
+  content: MilestoneContent;
+  /** @maxLength 500 */
+  practiceVideoPath: string;
+  sampleFeedbackNote?: SampleFeedbackNote;
+  /** @maxItems 200 */
+  practiceEntries?: PracticeEntry[];
+}
+
+export type DogAssignmentProgress = {[key: string]: 'not-started' | 'in-progress' | 'completed'};
+
+export interface DogAssignment {
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  dogId: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  pathId: string;
+  /**
+     * Independent dog-assigned snapshots; omitted only in legacy records.
+     * @maxItems 200
+     */
+  milestones?: AssignedMilestone[];
+  progress: DogAssignmentProgress;
+}
+
+export interface GuestSnapshot {
+  dog: DogProfile;
+  path: GuestSnapshotPath;
+  assignment: DogAssignment;
+}
+
+export interface GuestCredentials {
+  id: string;
+  managementToken: string;
+  handlerToken: string;
+}
+
+export interface GuestView {
+  id: string;
+  snapshot: GuestSnapshot;
+  entries: PracticeEntry[];
+  active: boolean;
+  revoked: boolean;
+  revision: number;
+}
+
+export interface GuestUploadTicket {
+  mediaId: string;
+  uploadURL: string;
+  videoPath: string;
+}
+
+export interface HealthStatus {
+  status: string;
 }
 
 export type MilestoneTemplate = MilestoneContent & {
@@ -73,88 +251,6 @@ export interface TrainingProgram {
   description: string;
   /** @maxItems 200 */
   steps: PathStep[];
-}
-
-export interface DogProfile {
-  /**
-     * @minLength 1
-     * @maxLength 100
-     */
-  id: string;
-  /**
-     * @minLength 1
-     * @maxLength 150
-     */
-  name: string;
-  /** @maxLength 150 */
-  breed: string;
-  /** @maxLength 150 */
-  trainingType: string;
-  /** @maxLength 10 */
-  birthDate: string;
-  /** @maxLength 150 */
-  handlerName: string;
-  /** @maxLength 500 */
-  photo: string;
-}
-
-export type SampleFeedbackNoteSource = typeof SampleFeedbackNoteSource[keyof typeof SampleFeedbackNoteSource];
-
-
-export const SampleFeedbackNoteSource = {
-  Simulated_sample_feedback: 'Simulated sample feedback',
-} as const;
-
-export interface SampleFeedbackNote {
-  source: SampleFeedbackNoteSource;
-  /**
-     * @minLength 1
-     * @maxLength 10000
-     */
-  text: string;
-}
-
-export interface AssignedMilestone {
-  /**
-     * @minLength 1
-     * @maxLength 100
-     */
-  id: string;
-  /**
-     * @minLength 1
-     * @maxLength 100
-     */
-  templateId: string;
-  content: MilestoneContent;
-  /** @maxLength 500 */
-  practiceVideoPath: string;
-  sampleFeedbackNote?: SampleFeedbackNote;
-}
-
-export type DogAssignmentProgress = {[key: string]: 'not-started' | 'in-progress' | 'completed'};
-
-export interface DogAssignment {
-  /**
-     * @minLength 1
-     * @maxLength 100
-     */
-  id: string;
-  /**
-     * @minLength 1
-     * @maxLength 100
-     */
-  dogId: string;
-  /**
-     * @minLength 1
-     * @maxLength 100
-     */
-  pathId: string;
-  /**
-     * Independent dog-assigned snapshots; omitted only in legacy records.
-     * @maxItems 200
-     */
-  milestones?: AssignedMilestone[];
-  progress: DogAssignmentProgress;
 }
 
 export type TrainingWorkspaceVersion = typeof TrainingWorkspaceVersion[keyof typeof TrainingWorkspaceVersion];
