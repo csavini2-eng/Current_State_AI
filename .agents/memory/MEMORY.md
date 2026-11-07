@@ -1,1 +1,2 @@
 - [Live-link revocation](live-link-revocation.md) — revoked responses override cached guides; sharing controls must recover persisted links after navigation.
+- [Local video lifetimes](local-video-lifetimes.md) — immutable demonstration files can be shared by independent snapshots; unlink a scope’s reference, not another dog’s blob.

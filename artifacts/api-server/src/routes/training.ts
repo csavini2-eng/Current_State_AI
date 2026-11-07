@@ -4,7 +4,8 @@ import { getAuth } from '@clerk/express';
 import { and, eq } from 'drizzle-orm';
 import { db, trainingWorkspaces, handlerShares, trainingMedia } from '@workspace/db';
 import { SaveTrainingWorkspaceBody, GetTrainingWorkspaceResponse, SaveTrainingWorkspaceResponse, CreateHandlerShareBody, CreateHandlerShareResponse, GetHandlerPathResponse } from '@workspace/api-zod';
-import { sharedPath } from '../lib/training';
+import { sharedPath, snapshotWorkspace } from '../lib/training';
+import type { TrainingWorkspace } from '@workspace/api-zod';
 
 const router: IRouter = Router();
 export const requireTrainer: RequestHandler = (req, res, next) => {
@@ -25,13 +26,14 @@ router.get('/training/workspace', requireTrainer, async (req, res): Promise<void
   const ownerId = getAuth(req).userId!;
   const [workspace] = await db.select().from(trainingWorkspaces).where(eq(trainingWorkspaces.ownerId, ownerId));
   res.setHeader('Cache-Control', 'no-store');
-  res.json(GetTrainingWorkspaceResponse.parse(workspace ? { state: workspace.state, revision: workspace.revision, updatedAt: workspace.updatedAt.toISOString() } : { state: null, revision: 0, updatedAt: null }));
+  res.json(GetTrainingWorkspaceResponse.parse(workspace ? { state: snapshotWorkspace(workspace.state as TrainingWorkspace), revision: workspace.revision, updatedAt: workspace.updatedAt.toISOString() } : { state: null, revision: 0, updatedAt: null }));
 });
 router.put('/training/workspace', requireTrainer, async (req, res): Promise<void> => {
   const ownerId = getAuth(req).userId!;
   const parsed = SaveTrainingWorkspaceBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: 'Some training fields are invalid or too long. Please check them before saving.' }); return; }
-  const { state, revision } = parsed.data;
+  const { revision } = parsed.data;
+  let { state } = parsed.data;
   const validId = (id: string) => /^[a-zA-Z0-9_-]{1,100}$/.test(id);
   const unique = (ids: string[]) => ids.every(validId) && new Set(ids).size === ids.length;
   if (![state.dogs, state.paths, state.milestones, state.assignments].every(items => unique(items.map(item => item.id)))) {
@@ -59,12 +61,20 @@ router.put('/training/workspace', requireTrainer, async (req, res): Promise<void
       res.status(400).json({ error: 'Assign each existing path to each dog only once.' }); return;
     }
     combinations.add(key);
-    assignment.progress = Object.fromEntries(Object.entries(assignment.progress).filter(([id]) => path.steps.some(s => s.id === id)));
+  }
+  const [previous] = await db.select().from(trainingWorkspaces).where(eq(trainingWorkspaces.ownerId, ownerId));
+  state = snapshotWorkspace(state, previous?.state as TrainingWorkspace | undefined);
+  if (state.assignments.some(a => !unique(a.milestones!.map(m => m.id)))) {
+    res.status(400).json({ error: 'Each assigned milestone needs a unique valid identifier within its dog’s path.' }); return;
   }
   const references = [
     ...state.dogs.filter(d => d.photo).map(d => ({ path: d.photo, type: 'image/' })),
     ...state.milestones.filter(m => m.videoPath).map(m => ({ path: m.videoPath, type: 'video/' })),
     ...state.paths.flatMap(p => p.steps.filter(s => s.customization?.videoPath).map(s => ({ path: s.customization!.videoPath, type: 'video/' }))),
+    ...state.assignments.flatMap(a => a.milestones!.flatMap(m => [
+      ...(m.content.videoPath ? [{ path: m.content.videoPath, type: 'video/' }] : []),
+      ...(m.practiceVideoPath ? [{ path: m.practiceVideoPath, type: 'video/' }] : []),
+    ])),
   ];
   if (references.length) {
     const media = await db.select().from(trainingMedia).where(and(eq(trainingMedia.ownerId, ownerId), eq(trainingMedia.confirmed, true)));

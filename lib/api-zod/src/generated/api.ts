@@ -85,6 +85,28 @@ export const getTrainingWorkspaceResponseStateOneAssignmentsItemDogIdMax = 100;
 
 export const getTrainingWorkspaceResponseStateOneAssignmentsItemPathIdMax = 100;
 
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemIdMax = 100;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemTemplateIdMax = 100;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentNameMax = 150;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentDescriptionMax = 1000;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentCommandMax = 500;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentHandSignalMax = 2000;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentInstructionsMax = 12000;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentCategoryMax = 100;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentVideoPathMax = 500;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax = 500;
+
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax = 200;
+
 export const getTrainingWorkspaceResponseStateOneAssignmentsMax = 1000;
 
 
@@ -136,6 +158,21 @@ export const GetTrainingWorkspaceResponse = zod.object({
   "id": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemIdMax),
   "dogId": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemDogIdMax),
   "pathId": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentNameMax),
+  "description": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax)
+})).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(getTrainingWorkspaceResponseStateOneAssignmentsMax)
 }),zod.null()]),
@@ -212,6 +249,28 @@ export const saveTrainingWorkspaceBodyStateAssignmentsItemDogIdMax = 100;
 
 export const saveTrainingWorkspaceBodyStateAssignmentsItemPathIdMax = 100;
 
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemIdMax = 100;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemTemplateIdMax = 100;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentNameMax = 150;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentDescriptionMax = 1000;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentCommandMax = 500;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentHandSignalMax = 2000;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentInstructionsMax = 12000;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentCategoryMax = 100;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentVideoPathMax = 500;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeVideoPathMax = 500;
+
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesMax = 200;
+
 export const saveTrainingWorkspaceBodyStateAssignmentsMax = 1000;
 
 export const saveTrainingWorkspaceBodyRevisionMin = 0;
@@ -265,6 +324,21 @@ export const SaveTrainingWorkspaceBody = zod.object({
   "id": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemIdMax),
   "dogId": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemDogIdMax),
   "pathId": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentNameMax),
+  "description": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeVideoPathMax)
+})).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(saveTrainingWorkspaceBodyStateAssignmentsMax)
 }),
@@ -339,6 +413,28 @@ export const saveTrainingWorkspaceResponseStateOneAssignmentsItemDogIdMax = 100;
 
 export const saveTrainingWorkspaceResponseStateOneAssignmentsItemPathIdMax = 100;
 
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemIdMax = 100;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemTemplateIdMax = 100;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentNameMax = 150;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentDescriptionMax = 1000;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentCommandMax = 500;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentHandSignalMax = 2000;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentInstructionsMax = 12000;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentCategoryMax = 100;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentVideoPathMax = 500;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax = 500;
+
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax = 200;
+
 export const saveTrainingWorkspaceResponseStateOneAssignmentsMax = 1000;
 
 
@@ -390,6 +486,21 @@ export const SaveTrainingWorkspaceResponse = zod.object({
   "id": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemIdMax),
   "dogId": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemDogIdMax),
   "pathId": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemPathIdMax),
+  "milestones": zod.array(zod.object({
+  "id": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemIdMax),
+  "templateId": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemTemplateIdMax),
+  "content": zod.object({
+  "name": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentNameMax),
+  "description": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentDescriptionMax),
+  "command": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentCommandMax),
+  "handSignal": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentHandSignalMax),
+  "instructions": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentInstructionsMax),
+  "category": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentCategoryMax),
+  "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
+  "videoPath": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentVideoPathMax)
+}),
+  "practiceVideoPath": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax)
+})).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(saveTrainingWorkspaceResponseStateOneAssignmentsMax)
 }),zod.null()]),

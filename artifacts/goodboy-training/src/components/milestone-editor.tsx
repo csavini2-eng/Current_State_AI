@@ -2,7 +2,8 @@ import { type FormEvent, useState } from 'react';
 import { Save } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
 import { isExampleObjective, type MilestoneContent } from '@/lib/training';
-import { Modal, UploadField } from './shared';
+import { Modal } from './shared';
+import { LocalVideoField } from './local-video-field';
 
 export function MilestoneEditor({ title, note, initial, objectiveExample, onClose, onSave }: { title: string; note?: string; initial: MilestoneContent; objectiveExample?: string; onClose: () => void; onSave: (c: MilestoneContent) => Promise<boolean> }) {
   const { isSaving, isUploading } = useWorkspace();
@@ -33,7 +34,7 @@ export function MilestoneEditor({ title, note, initial, objectiveExample, onClos
         <div className="field"><label htmlFor="m-ins">Training instructions</label><textarea id="m-ins" value={d.instructions} onChange={(e) => set({ instructions: e.target.value })} placeholder="What to do, and what to look for" /></div>
         <div className="field"><label htmlFor="m-cat">Category</label><input id="m-cat" value={d.category} onChange={(e) => set({ category: e.target.value })} /></div>
         <div className="field"><label htmlFor="m-dif">Difficulty</label><select id="m-dif" value={d.difficulty} onChange={(e) => set({ difficulty: e.target.value as MilestoneContent['difficulty'] })}><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
-        <UploadField id="m-video" label="Demonstration video (optional)" kind="video" value={d.videoPath} onChange={(p) => set({ videoPath: p })} />
+        <LocalVideoField label="Demonstration video (trainer reference)" kind="demonstration" value={d.videoPath} hint="Applies to this draft. Saved together with the other fields." onChange={(ref) => set({ videoPath: ref })} />
       </div>
       {errors.length > 0 && <div className="error-text" role="alert">{errors.map((x) => <div key={x}>{x}</div>)}</div>}
       <div className="form-actions" style={{ justifyContent: 'space-between' }}>

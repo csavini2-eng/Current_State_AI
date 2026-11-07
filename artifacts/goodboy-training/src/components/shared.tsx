@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter';
 import * as Dialog from '@radix-ui/react-dialog';
 import { CheckCircle2, Circle, Dog as DogIcon, Layers, PawPrint, Play, Route as RouteIcon, Trash2, Upload, X } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
-import { mediaUrl, resolveStep, statusLabel, type DogProfile, type MilestoneContent, type MilestoneTemplate, type Status, type TrainingProgram, type TrainingWorkspace, type DogAssignment } from '@/lib/training';
+import { assignmentMilestones, mediaUrl, resolveStep, statusLabel, type DogProfile, type MilestoneContent, type MilestoneTemplate, type Status, type TrainingProgram, type TrainingWorkspace, type DogAssignment, type AssignedMilestone } from '@/lib/training';
 import rayaPortrait from '../assets/raya-sample.jpg';
 
 export const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -29,9 +29,10 @@ export function stepItems(state: TrainingWorkspace, path: TrainingProgram) {
 }
 export function assignmentStats(state: TrainingWorkspace, a: DogAssignment) {
   const path = state.paths.find((p) => p.id === a.pathId);
-  const items = path ? stepItems(state, path) : [];
-  const get = (id: string): Status => a.progress[id] ?? 'not-started';
-  return { path, items, total: items.length, done: items.filter((i) => get(i.step.id) === 'completed').length, active: items.filter((i) => get(i.step.id) === 'in-progress').length };
+  // Dog progress always counts that assignment's own snapshot, never the live path steps.
+  const items: AssignedMilestone[] = assignmentMilestones(state, a);
+  const get = (id: string): Status => (a.progress[id] as Status | undefined) ?? 'not-started';
+  return { path, items, total: items.length, done: items.filter((i) => get(i.id) === 'completed').length, active: items.filter((i) => get(i.id) === 'in-progress').length };
 }
 export function templateById(state: TrainingWorkspace, id: string): MilestoneTemplate | undefined { return state.milestones.find((m) => m.id === id); }
 

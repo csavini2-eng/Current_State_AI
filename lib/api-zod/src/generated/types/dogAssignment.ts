@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AssignedMilestone } from './assignedMilestone';
 import type { DogAssignmentProgress } from './dogAssignmentProgress';
 
 export interface DogAssignment {
@@ -23,5 +24,10 @@ export interface DogAssignment {
      * @maxLength 100
      */
   pathId: string;
+  /**
+     * Independent dog-assigned snapshots; omitted only in legacy records.
+     * @maxItems 200
+     */
+  milestones?: AssignedMilestone[];
   progress: DogAssignmentProgress;
 }

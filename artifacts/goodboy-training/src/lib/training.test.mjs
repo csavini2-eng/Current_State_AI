@@ -1,6 +1,6 @@
 import test, { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { seedWorkspace, loadPrototype, resolveStep, ageLabel, mediaUrl, foundationObjectives, foundationObjectiveExample, isExampleObjective } from './training.ts';
+import { seedWorkspace, loadPrototype, resolveStep, ageLabel, mediaUrl, foundationObjectives, foundationObjectiveExample, isExampleObjective, createAssignment, migrateAssignments, assignmentMilestones } from './training.ts';
 
 const values = new Map();
 globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
@@ -91,4 +91,69 @@ test('old sample blank objectives remain blank until a trainer reviews and saves
 test('custom milestones named Sit are not silently treated as sample templates', () => {
   assert.equal(foundationObjectiveExample('custom-id', 'Sit'), undefined);
   assert.equal(foundationObjectiveExample('sit', 'Trainer renamed skill'), undefined);
+});
+test('two dog assignments hold independent content, demonstration references and practice recordings', () => {
+  const state = seedWorkspace();
+  const raya = state.assignments[0];
+  const doug = createAssignment(state, 'doug', 'foundation', 'doug-foundation');
+  const originalPath = structuredClone(state.paths);
+  const originalGallery = structuredClone(state.milestones);
+  const originalDoug = structuredClone(doug);
+  const sit = raya.milestones[0];
+  sit.content.command = 'Raya-only cue';
+  sit.content.description = 'Raya-only objective';
+  sit.content.handSignal = 'Raya-only gesture';
+  sit.content.instructions = 'Raya-only instructions';
+  sit.content.videoPath = 'local-video:raya-demo';
+  sit.practiceVideoPath = 'local-video:raya-practice';
+  assert.deepEqual(doug, originalDoug);
+  assert.deepEqual(state.paths, originalPath);
+  assert.deepEqual(state.milestones, originalGallery);
+  sit.practiceVideoPath = '';
+  assert.equal(sit.content.videoPath, 'local-video:raya-demo');
+  assert.equal(doug.milestones[0].practiceVideoPath, '');
+});
+test('adding an assignment-only milestone leaves the reusable path and another dog unchanged', () => {
+  const state = seedWorkspace();
+  const doug = createAssignment(state, 'doug', 'foundation', 'doug-foundation');
+  const originalPath = structuredClone(state.paths[0]);
+  const originalDoug = structuredClone(doug);
+  state.assignments[0].milestones.push({ id: 'raya-extra-sit', templateId: 'sit', content: structuredClone(state.milestones[0]), practiceVideoPath: '' });
+  assert.equal(state.assignments[0].milestones.length, 6);
+  assert.deepEqual(state.paths[0], originalPath);
+  assert.deepEqual(doug, originalDoug);
+});
+test('gallery and reusable-path edits cannot overwrite an existing dog snapshot, even after reload', () => {
+  const state = seedWorkspace();
+  const original = structuredClone(state.assignments[0]);
+  state.milestones[0].command = 'New gallery cue';
+  state.paths[0].steps[0].customization = { ...state.milestones[0], command: 'New reusable path cue', videoPath: '/objects/uploads/example' };
+  values.set('goodboy-prototype-v2', JSON.stringify(state));
+  const loaded = loadPrototype();
+  assert.deepEqual(loaded.assignments[0], original);
+  const laterDog = createAssignment(loaded, 'doug', 'foundation', 'doug-new');
+  assert.equal(laterDog.milestones[0].content.command, 'New reusable path cue');
+});
+test('legacy assignment migration freezes currently resolved customizations and references without changing IDs or progress', () => {
+  const state = seedWorkspace();
+  delete state.assignments[0].milestones;
+  state.paths[0].steps[0].customization = { ...state.milestones[0], description: 'Trainer objective', command: 'Trainer cue', handSignal: 'Trainer signal', instructions: 'Trainer instructions', videoPath: '/objects/uploads/old-private-video' };
+  state.assignments[0].progress = { 'step-sit': 'completed', historical: 'in-progress' };
+  const raw = JSON.stringify(state);
+  values.set('goodboy-prototype-v2', raw);
+  const loaded = loadPrototype();
+  const assigned = loaded.assignments[0];
+  assert.equal(assigned.id, 'raya-foundation');
+  assert.equal(assigned.milestones[0].id, 'step-sit');
+  assert.deepEqual(assigned.milestones[0].content, state.paths[0].steps[0].customization);
+  assert.equal(assigned.milestones[0].content.videoPath, '/objects/uploads/old-private-video');
+  assert.deepEqual(assigned.progress, state.assignments[0].progress);
+  assert.equal(values.get('goodboy-prototype-v2'), raw);
+  assert.deepEqual(migrateAssignments(loaded), loaded);
+});
+test('an intentionally empty dog journey stays empty and does not inherit newly added path steps', () => {
+  const state = seedWorkspace();
+  state.assignments[0].milestones = [];
+  const migrated = migrateAssignments(state);
+  assert.deepEqual(assignmentMilestones(migrated, migrated.assignments[0]), []);
 });

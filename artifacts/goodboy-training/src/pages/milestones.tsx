@@ -26,7 +26,7 @@ export function MilestonesPage() {
     const path = state.paths.find((p) => p.id === target);
     if (!path || !sel.length) return;
     const steps = [...path.steps, ...sel.map((templateId) => ({ id: newId(), templateId, customization: null }))];
-    if (await save({ ...state, paths: state.paths.map((p) => p.id === path.id ? { ...p, steps } : p) })) { setSel([]); go(`/journey/${path.id}`); }
+    if (await save({ ...state, paths: state.paths.map((p) => p.id === path.id ? { ...p, steps } : p) })) { setSel([]); go(`/journey/${path.id}?scope=path`); }
   };
   return <main className="main page-enter">
     <header className="top"><div><Label>Reusable skills</Label><h1>Milestone Gallery</h1><p className="lede">Create a skill once, then reuse it in any path.</p></div>
@@ -52,6 +52,6 @@ export function MilestonesPage() {
         </div>
       </article>;
     })}</div> : <div className="empty-state"><Layers size={30} /><h2>{q ? 'No matching milestones' : 'The gallery is empty'}</h2><p>{q ? 'Try a different name.' : 'Create your first reusable skill.'}</p></div>}
-    {editor && <MilestoneEditor title={editor.id ? 'Edit original milestone' : 'New milestone'} note={editor.id ? 'Changes update every path that uses the original, except paths with their own customized copy.' : 'This creates a reusable milestone in the gallery.'} initial={editor.initial} objectiveExample={editor.id ? foundationObjectiveExample(editor.id, editor.initial.name) : undefined} onClose={() => setEditor(null)} onSave={saveTemplate} />}
+    {editor && <MilestoneEditor title={editor.id ? 'Edit original milestone' : 'New milestone'} note={editor.id ? 'Changes update reusable paths that use the original, except paths with their own customized copy. Dogs already assigned keep their own versions.' : 'This creates a reusable milestone in the gallery.'} initial={editor.initial} objectiveExample={editor.id ? foundationObjectiveExample(editor.id, editor.initial.name) : undefined} onClose={() => setEditor(null)} onSave={saveTemplate} />}
   </main>;
 }

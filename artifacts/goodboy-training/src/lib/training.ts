@@ -1,5 +1,5 @@
-import type { TrainingWorkspace, MilestoneContent, PathStep, DogProfile } from '@workspace/api-client-react';
-export type { TrainingWorkspace, MilestoneContent, MilestoneTemplate, DogProfile, TrainingProgram, DogAssignment, PathStep } from '@workspace/api-client-react';
+import type { TrainingWorkspace, MilestoneContent, PathStep, DogProfile, DogAssignment, AssignedMilestone } from '@workspace/api-client-react';
+export type { TrainingWorkspace, MilestoneContent, MilestoneTemplate, DogProfile, TrainingProgram, DogAssignment, PathStep, AssignedMilestone } from '@workspace/api-client-react';
 export type Status = 'not-started' | 'in-progress' | 'completed';
 export const statusLabel: Record<Status, string> = { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Completed' };
 export const newId = () => crypto.randomUUID();
@@ -20,21 +20,41 @@ export function isExampleObjective(description: string): boolean {
 export function seedWorkspace(): TrainingWorkspace {
   const names = ['Sit', 'Stay', 'Retrieve', 'Come', 'Heel'];
   const ids = names.map(name => name.toLowerCase());
-  return {
+  const state: TrainingWorkspace = {
     version: 2,
     dogs: [{ id: 'raya', name: 'Raya', breed: 'Newfoundland', trainingType: 'Service dog in training', birthDate: '', handlerName: '', photo: '' }],
     // Defaults apply only to a fresh workspace, never when loading saved guest records.
     milestones: names.map((name, i) => ({ ...blankMilestone(), id: ids[i], name, description: foundationObjectives[ids[i]] })),
     paths: [{ id: 'foundation', name: 'Foundation Skills', description: 'The everyday cues that build a shared language.', steps: ids.map(id => ({ id: `step-${id}`, templateId: id, customization: null })) }],
-    assignments: [{ id: 'raya-foundation', dogId: 'raya', pathId: 'foundation', progress: {} }],
+    assignments: [],
   };
+  state.assignments.push(createAssignment(state, 'raya', 'foundation', 'raya-foundation'));
+  return state;
+}
+export function snapshotSteps(state: TrainingWorkspace, pathId: string): AssignedMilestone[] {
+  const path = state.paths.find(p => p.id === pathId);
+  if (!path) throw new Error('The assigned training path is missing. Existing records have not been changed.');
+  return path.steps.map(step => {
+    const content = resolveStep(state, step);
+    if (!content) throw new Error('An assigned milestone is missing. Existing records have not been changed.');
+    return { id: step.id, templateId: step.templateId, content: structuredClone(content), practiceVideoPath: '' };
+  });
+}
+export function createAssignment(state: TrainingWorkspace, dogId: string, pathId: string, id: string = newId()): DogAssignment {
+  return { id, dogId, pathId, progress: {}, milestones: snapshotSteps(state, pathId) };
+}
+export function migrateAssignments(state: TrainingWorkspace): TrainingWorkspace {
+  return { ...state, assignments: state.assignments.map(a => a.milestones !== undefined ? a : { ...a, milestones: snapshotSteps(state, a.pathId) }) };
+}
+export function assignmentMilestones(state: TrainingWorkspace, assignment: DogAssignment): AssignedMilestone[] {
+  return assignment.milestones ?? snapshotSteps(state, assignment.pathId);
 }
 export function loadPrototype(): TrainingWorkspace {
   const saved = localStorage.getItem('goodboy-prototype-v2');
   if (saved) {
     const state = JSON.parse(saved);
     if (state.version !== 2 || !Array.isArray(state.dogs) || !Array.isArray(state.milestones) || !Array.isArray(state.paths) || !Array.isArray(state.assignments)) throw new Error('Saved records could not be loaded. Your original data has been retained.');
-    return state;
+    return migrateAssignments(state);
   }
   const raw = localStorage.getItem('goodboy-prototype-v1');
   if (!raw) return seedWorkspace();
@@ -42,12 +62,12 @@ export function loadPrototype(): TrainingWorkspace {
   if (!old.profile || !Array.isArray(old.paths) || !Array.isArray(old.skills)) throw new Error('Saved records could not be loaded. Your original data has been retained.');
   const photo = String(old.profile.photo || '');
   const dogs: DogProfile[] = [{ id: 'raya', name: old.profile.name, breed: old.profile.breed, trainingType: old.profile.trainingType, handlerName: '', birthDate: '', photo: photo.startsWith('data:image/') ? photo : '' }];
-  const milestones = old.skills.map((s: Record<string, string>) => ({ ...blankMilestone(), id: s.id, name: s.name || '', command: s.command || '', handSignal: s.handSignal || '', instructions: s.instructions || '' }));
+  const milestones = old.skills.map((s: Record<string, string>) => ({ ...blankMilestone(), id: s.id, name: s.name || '', description: s.description || '', command: s.command || '', handSignal: s.handSignal || '', instructions: s.instructions || '', videoPath: s.videoPath || s.videoUrl || '' }));
   const paths = old.paths.map((p: {id: string; name: string; description: string; skillIds: string[]}) => ({ id: p.id, name: p.name, description: p.description, steps: p.skillIds.filter(id => milestones.some((m: {id: string}) => m.id === id)).map(id => ({ id: `step-${id}`, templateId: id, customization: null })) }));
   const path = paths.find((p: {id: string}) => p.id === old.profile.pathId);
   const progress: Record<string, Status> = {};
   old.skills.forEach((s: {id: string; status: Status}) => { progress[`step-${s.id}`] = s.status || 'not-started'; });
-  return { version: 2, dogs, milestones, paths, assignments: path ? [{ id: 'raya-foundation', dogId: 'raya', pathId: path.id, progress }] : [] };
+  return migrateAssignments({ version: 2, dogs, milestones, paths, assignments: path ? [{ id: 'raya-foundation', dogId: 'raya', pathId: path.id, progress }] : [] });
 }
 export function resolveStep(state: TrainingWorkspace, step: PathStep): MilestoneContent | undefined {
   return step.customization || state.milestones.find(m => m.id === step.templateId);

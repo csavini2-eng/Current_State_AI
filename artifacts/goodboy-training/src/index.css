@@ -335,3 +335,18 @@ h1,h2,h3,dd { overflow-wrap:anywhere; }
   dd { min-width:0; }
   .handler-page .brand-name { display:block; }
 }
+.scope-note { background:#fff3ea; border-left:4px solid var(--o); border-radius:12px; padding:10px 14px; font-size:14px; font-weight:800; color:var(--od); margin:0 0 18px; }
+.video-sections { display:grid; gap:16px; }
+.video-field { border:2px solid var(--line); border-radius:18px; padding:16px; background:#fff; }
+.video-practice { border-color:#bfe8cf; background:#f4fcf7; }
+.video-field-head { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.video-field-head h3 { margin:0; font-size:18px; }
+.video-kind { font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; padding:4px 10px; border-radius:99px; background:var(--ol); color:var(--od); }
+.video-practice .video-kind { background:#dcf5e6; color:#17783f; }
+.video-field video { width:100%; border-radius:14px; background:#2b1d16; margin-top:10px; display:block; }
+.video-msg { font-weight:800; font-size:14px; color:#6b4800; background:#fff1c9; border-radius:12px; padding:10px 12px; margin:10px 0 0; }
+.video-msg.quiet { background:#f4ebe4; color:var(--mute); }
+.video-skeleton { height:180px; border-radius:14px; margin-top:10px; background:linear-gradient(90deg,#f6e6d9,#fff3ea,#f6e6d9); background-size:200% 100%; animation:shimmer 1.4s infinite; }
+.file-trigger:focus-within, .hidden-file:focus-visible + * { outline:3px solid var(--od); }
+.video-field:has(.hidden-file:focus-visible) .file-trigger { outline:3px solid var(--od); outline-offset:3px; }
+.video-readonly .actions-row { display:none; }
