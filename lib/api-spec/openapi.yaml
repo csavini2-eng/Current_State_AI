@@ -178,6 +178,14 @@ components:
         birthDate: { type: string, maxLength: 10 }
         handlerName: { type: string, maxLength: 150 }
         photo: { type: string, maxLength: 500 }
+    AssignedMilestone:
+      type: object
+      required: [id, templateId, content, practiceVideoPath]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 100 }
+        templateId: { type: string, minLength: 1, maxLength: 100 }
+        content: { $ref: "#/components/schemas/MilestoneContent" }
+        practiceVideoPath: { type: string, maxLength: 500 }
     DogAssignment:
       type: object
       required: [id, dogId, pathId, progress]
@@ -185,6 +193,11 @@ components:
         id: { type: string, minLength: 1, maxLength: 100 }
         dogId: { type: string, minLength: 1, maxLength: 100 }
         pathId: { type: string, minLength: 1, maxLength: 100 }
+        milestones:
+          type: array
+          maxItems: 200
+          description: Independent dog-assigned snapshots; omitted only in legacy records.
+          items: { $ref: "#/components/schemas/AssignedMilestone" }
         progress:
           type: object
           additionalProperties:

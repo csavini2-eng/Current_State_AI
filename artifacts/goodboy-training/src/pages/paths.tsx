@@ -2,7 +2,7 @@ import { type FormEvent, useState } from 'react';
 import { Link } from 'wouter';
 import { BookOpen, Map, Pencil, Plus, Route as RouteIcon, Save, Trash2 } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
-import { newId, type TrainingProgram } from '@/lib/training';
+import { createAssignment, newId, type TrainingProgram } from '@/lib/training';
 import { Label, Loading, Modal } from '@/components/shared';
 
 export function PathsPage() {
@@ -22,7 +22,9 @@ export function PathsPage() {
   const assign = async (pathId: string) => {
     const dogId = pick[pathId];
     if (!dogId || state.assignments.some((a) => a.dogId === dogId && a.pathId === pathId)) return;
-    if (await save({ ...state, assignments: [...state.assignments, { id: newId(), dogId, pathId, progress: {} }] })) setPick({ ...pick, [pathId]: '' });
+    let next;
+    try { next = createAssignment(state, dogId, pathId); } catch (e) { setError(e instanceof Error ? e.message : 'The path could not be assigned.'); return; }
+    if (await save({ ...state, assignments: [...state.assignments, next] })) setPick({ ...pick, [pathId]: '' });
   };
   const del = async (p: TrainingProgram) => {
     if (!window.confirm(`Delete “${p.name}”? Dog assignments for it are removed. Milestones stay in the gallery.`)) return;
@@ -31,6 +33,7 @@ export function PathsPage() {
   const openNew = () => { setForm({ name: '', description: '' }); setError(''); };
   return <main className="main page-enter">
     <header className="top"><div><Label>Milestones, then paths, then dogs</Label><h1>Training Paths</h1></div><button className="btn" onClick={openNew}><Plus size={16} /> New path</button></header>
+    {error && !form && <p role="alert" className="error-text">{error}</p>}
     {state.paths.length ? <div className="path-list">{state.paths.map((path) => {
       const dogs = state.assignments.filter((a) => a.pathId === path.id).map((a) => state.dogs.find((d) => d.id === a.dogId)).filter((d) => !!d);
       const free = state.dogs.filter((d) => !dogs.some((x) => x?.id === d.id));
@@ -41,7 +44,7 @@ export function PathsPage() {
           <p>{path.description || 'Add a short description for this path.'}</p>
           <div className="meta"><span>{path.steps.length} {path.steps.length === 1 ? 'milestone' : 'milestones'}</span><span>{dogs.length} {dogs.length === 1 ? 'dog' : 'dogs'}</span></div>
           <div className="actions-row">
-            <Link href={`/journey/${path.id}`} className="btn btn-small"><Map size={15} /> Open journey</Link>
+            <Link href={`/journey/${path.id}?scope=path`} className="btn btn-small"><Map size={15} /> Open journey</Link>
             <select className="inline-select" aria-label={`Dog to assign to ${path.name}`} value={pick[path.id] ?? ''} onChange={(e) => setPick({ ...pick, [path.id]: e.target.value })}><option value="">Assign to a dog</option>{free.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}</select>
             <button className="btn btn-quiet btn-small" disabled={!pick[path.id] || isSaving} onClick={() => void assign(path.id)}>Assign</button>
             <button className="icon-btn" aria-label={`Edit ${path.name}`} onClick={() => { setForm({ id: path.id, name: path.name, description: path.description }); setError(''); }}><Pencil size={16} /></button>

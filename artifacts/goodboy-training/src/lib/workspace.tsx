@@ -2,7 +2,7 @@ import { createContext, Fragment, useContext, useEffect, useRef, useState, type 
 import { useAuth } from '@clerk/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetTrainingWorkspace, useSaveTrainingWorkspace, requestUploadUrl, confirmUpload, type UploadInput, type TrainingWorkspace } from '@workspace/api-client-react';
-import { loadPrototype, seedWorkspace } from './training';
+import { loadPrototype, seedWorkspace, migrateAssignments } from './training';
 
 async function prepareImage(file: Blob): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
@@ -60,7 +60,7 @@ export function GuestWorkspaceProvider({ children }: { children: ReactNode }) {
     if (blocked.current) { setError('Saved records could not be loaded. Reload records before saving; your existing data has not been overwritten.'); return false; }
     setSaving(true);
     try {
-      const copy = structuredClone(next);
+      const copy = migrateAssignments(structuredClone(next));
       localStorage.setItem('goodboy-prototype-v2', JSON.stringify(copy));
       setState(copy); setError(''); return true;
     } catch {
@@ -112,7 +112,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isSignedIn || !query.data) return;
     revision.current = query.data.revision;
-    if (query.data.state) setState(query.data.state);
+    if (query.data.state) setState(migrateAssignments(query.data.state));
   }, [isSignedIn, query.data, userId]);
   useEffect(() => {
     if (query.error) setError('Your saved workspace could not be loaded. Retry before making changes.');
@@ -128,7 +128,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     busy.current = true; setSaving(true); setError('');
     const savingUser = userId;
     try {
-      const next = structuredClone(nextState);
+      const next = migrateAssignments(structuredClone(nextState));
       if (isSignedIn) {
         // Move imported local photographs into App Storage, never database blobs.
         for (const dog of next.dogs) if (dog.photo.startsWith('data:image/')) {
