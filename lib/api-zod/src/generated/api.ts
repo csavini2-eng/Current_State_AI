@@ -105,6 +105,8 @@ export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemCo
 
 export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax = 500;
 
+export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
 export const getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax = 200;
 
 export const getTrainingWorkspaceResponseStateOneAssignmentsMax = 1000;
@@ -171,7 +173,11 @@ export const GetTrainingWorkspaceResponse = zod.object({
   "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
   "videoPath": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentVideoPathMax)
 }),
-  "practiceVideoPath": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax)
+  "practiceVideoPath": zod.string().max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax)
+}).optional()
 })).max(getTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(getTrainingWorkspaceResponseStateOneAssignmentsMax)
@@ -269,6 +275,8 @@ export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentV
 
 export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeVideoPathMax = 500;
 
+export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
 export const saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesMax = 200;
 
 export const saveTrainingWorkspaceBodyStateAssignmentsMax = 1000;
@@ -337,7 +345,11 @@ export const SaveTrainingWorkspaceBody = zod.object({
   "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
   "videoPath": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemContentVideoPathMax)
 }),
-  "practiceVideoPath": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeVideoPathMax)
+  "practiceVideoPath": zod.string().max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax)
+}).optional()
 })).max(saveTrainingWorkspaceBodyStateAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(saveTrainingWorkspaceBodyStateAssignmentsMax)
@@ -433,6 +445,8 @@ export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemC
 
 export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax = 500;
 
+export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax = 10000;
+
 export const saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax = 200;
 
 export const saveTrainingWorkspaceResponseStateOneAssignmentsMax = 1000;
@@ -499,7 +513,11 @@ export const SaveTrainingWorkspaceResponse = zod.object({
   "difficulty": zod.enum(['Beginner', 'Intermediate', 'Advanced']),
   "videoPath": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemContentVideoPathMax)
 }),
-  "practiceVideoPath": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax)
+  "practiceVideoPath": zod.string().max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemPracticeVideoPathMax),
+  "sampleFeedbackNote": zod.object({
+  "source": zod.enum(['Simulated sample feedback']),
+  "text": zod.string().min(1).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesItemSampleFeedbackNoteTextMax)
+}).optional()
 })).max(saveTrainingWorkspaceResponseStateOneAssignmentsItemMilestonesMax).optional().describe('Independent dog-assigned snapshots; omitted only in legacy records.'),
   "progress": zod.record(zod.string(), zod.enum(['not-started', 'in-progress', 'completed']))
 })).max(saveTrainingWorkspaceResponseStateOneAssignmentsMax)

@@ -1,5 +1,6 @@
 import type { TrainingWorkspace, MilestoneContent, PathStep, DogProfile, DogAssignment, AssignedMilestone } from '@workspace/api-client-react';
-export type { TrainingWorkspace, MilestoneContent, MilestoneTemplate, DogProfile, TrainingProgram, DogAssignment, PathStep, AssignedMilestone } from '@workspace/api-client-react';
+import { fillBlankSitFields } from './sample-sit.ts';
+export type { TrainingWorkspace, MilestoneContent, MilestoneTemplate, DogProfile, TrainingProgram, DogAssignment, PathStep, AssignedMilestone, SampleFeedbackNote } from '@workspace/api-client-react';
 export type Status = 'not-started' | 'in-progress' | 'completed';
 export const statusLabel: Record<Status, string> = { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Completed' };
 export const newId = () => crypto.randomUUID();
@@ -24,7 +25,10 @@ export function seedWorkspace(): TrainingWorkspace {
     version: 2,
     dogs: [{ id: 'raya', name: 'Raya', breed: 'Newfoundland', trainingType: 'Service dog in training', birthDate: '', handlerName: '', photo: '' }],
     // Defaults apply only to a fresh workspace, never when loading saved guest records.
-    milestones: names.map((name, i) => ({ ...blankMilestone(), id: ids[i], name, description: foundationObjectives[ids[i]] })),
+    milestones: names.map((name, i) => {
+      const content = { ...blankMilestone(), name, description: foundationObjectives[ids[i]] };
+      return { ...(ids[i] === 'sit' ? fillBlankSitFields(content) : content), id: ids[i] };
+    }),
     paths: [{ id: 'foundation', name: 'Foundation Skills', description: 'The everyday cues that build a shared language.', steps: ids.map(id => ({ id: `step-${id}`, templateId: id, customization: null })) }],
     assignments: [],
   };

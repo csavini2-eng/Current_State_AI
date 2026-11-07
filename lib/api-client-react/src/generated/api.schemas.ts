@@ -98,6 +98,22 @@ export interface DogProfile {
   photo: string;
 }
 
+export type SampleFeedbackNoteSource = typeof SampleFeedbackNoteSource[keyof typeof SampleFeedbackNoteSource];
+
+
+export const SampleFeedbackNoteSource = {
+  Simulated_sample_feedback: 'Simulated sample feedback',
+} as const;
+
+export interface SampleFeedbackNote {
+  source: SampleFeedbackNoteSource;
+  /**
+     * @minLength 1
+     * @maxLength 10000
+     */
+  text: string;
+}
+
 export interface AssignedMilestone {
   /**
      * @minLength 1
@@ -112,6 +128,7 @@ export interface AssignedMilestone {
   content: MilestoneContent;
   /** @maxLength 500 */
   practiceVideoPath: string;
+  sampleFeedbackNote?: SampleFeedbackNote;
 }
 
 export type DogAssignmentProgress = {[key: string]: 'not-started' | 'in-progress' | 'completed'};
