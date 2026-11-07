@@ -178,6 +178,14 @@ components:
         birthDate: { type: string, maxLength: 10 }
         handlerName: { type: string, maxLength: 150 }
         photo: { type: string, maxLength: 500 }
+    SampleFeedbackNote:
+      type: object
+      required: [source, text]
+      properties:
+        source:
+          type: string
+          enum: [Simulated sample feedback]
+        text: { type: string, minLength: 1, maxLength: 10000 }
     AssignedMilestone:
       type: object
       required: [id, templateId, content, practiceVideoPath]
@@ -186,6 +194,8 @@ components:
         templateId: { type: string, minLength: 1, maxLength: 100 }
         content: { $ref: "#/components/schemas/MilestoneContent" }
         practiceVideoPath: { type: string, maxLength: 500 }
+        sampleFeedbackNote:
+          $ref: "#/components/schemas/SampleFeedbackNote"
     DogAssignment:
       type: object
       required: [id, dogId, pathId, progress]

@@ -31,6 +31,14 @@ Existing assignments without snapshots are migrated from their currently resolve
 
 Demonstration videos show the trainer’s reference method. Practice videos belong to a particular dog’s assigned milestone. Selecting a practice video does not analyze it; automated feedback is not implemented.
 
+## Sit sample and simulated feedback
+
+- Fresh workspaces include the supplied Sit cue, objective, and editable example instructions. Existing trainer fields are preserved. “Use sample instructions” fills only blank fields in a dog’s editor draft and still requires review and Save.
+- “Sample Sit video” is a separate bundled public asset, never a personal demonstration/practice recording. The supplied 2160×3840 footage was optimized to full-frame 720×1280 H.264, preserving its 12.84-second duration and 25fps. It has no audio; the approximately 2 MB web copy is included in production builds. The large source upload is excluded from deploys/checkpoints going forward.
+- “Try sample feedback” displays prepared observations and an explicit simulated/no-analysis disclosure. A trainer can edit, save, dismiss, edit again, or remove the one sample-note record for that assigned milestone. Saved notes retain the “Simulated sample feedback” source. No model or video-analysis service is called.
+- Other practice-video instructions offer a separate preview-only Sit sample, never observations presented as analysis of a personal recording.
+- Progress uses Start practicing, Continue practicing, Mark completed, Practice again, and a secondary reset. Text labels accompany colors. Only successfully saved new completions trigger a brief checkmark/confetti confirmation; final completion adds “Training path completed. Great teamwork!” Reduced motion suppresses effects without suppressing the confirmation.
+
 Fresh Foundation Skills milestones have example completion objectives that trainers should tailor to each dog. Existing blank objectives are not backfilled: open the editor to review an offered example and save it explicitly. Existing cues, hand signals, instructions, and path customizations are not replaced.
 
 ## AI is not active
@@ -84,3 +92,14 @@ These current checks ran against the development preview, not the published prod
 - Real browser-recorded WebM files played successfully before and after reload. Practice replacement/removal affected only the intended dog; other practice and demonstration clips remained playable.
 - The browser pass verified opaque references in localStorage, actual video Blobs in IndexedDB, explicit storage-failure/temporary-preview behavior, and mobile dialog scrolling plus Escape/focus restoration.
 - Unauthenticated private workspace and upload requests still return 401. No real user or production records were modified during verification. Signed-in cloud-media flows were not re-tested; no cloud-video upload feature was added.
+
+## Sit sample and progress verification
+
+- All 23 model regression tests pass, as do workspace type checks and the production build. The existing non-blocking tooltip sourcemap warning remains.
+- The supplied sample played for a fresh guest with controls, no autoplay, and full-frame `contain` styling. The built copy has no audio stream (verified with ffprobe). At 390×844, the entire paused portrait player and its controls were visible without horizontal overflow.
+- Isolated browser checks verified the exact simulated disclosure, edited-note persistence, repeated Try without duplicates, dismiss/remove/re-save behavior, and retained source attribution.
+- Existing personal demonstration/practice references remained unchanged across note edits, sample-plan saves, and progress changes. Sample fields filled only blanks after review; cancelling discarded the draft, and saving affected only Raya.
+- Doug, reusable Foundation, and the gallery stayed independent. Dog journeys offered no reusable-path switch; Training Paths still opened the reusable editor.
+- A deliberately failed storage write preserved In progress and its counter and showed no celebration. Successful completion updated counts and announced the required text; reload did not replay it. Practice again and reset worked.
+- Reduced-motion keyboard completion produced the final 5-of-5 message without animation/confetti or scrolling. Escape restored focus. Non-Sit sample previews explicitly described only the sample clip and did not save observations against the other skill.
+- These checks used isolated development-browser data. The published site and signed-in cloud-media flows were not re-tested.

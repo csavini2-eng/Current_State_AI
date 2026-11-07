@@ -31,6 +31,7 @@ A trainer-facing dog-training demo for managing multiple dogs, reusable mileston
 - The public demo has no account prompts, real-sharing controls, or cloud-upload controls. Local demonstration and practice video selection/playback remain visible without sign-in.
 - Existing private workspaces stay private; existing capability links still grant read-only access to one assigned dog/path.
 - Editing has three distinct scopes: gallery original, reusable-path customization, and dog-assigned snapshot. A dog’s journey defaults to editing only that dog’s assignment; never offer an ambiguous original-edit action there.
+- Individual dog journeys must not offer a reusable-path editing switch. Reusable paths are managed from Training Paths, and gallery originals from Milestone Gallery.
 - Snapshot currently resolved milestone content when assigning a path and when migrating older assignments. Preserve content, IDs, progress, and video references; reusable template/path changes must never silently overwrite existing dog snapshots.
 - Adding, removing, or reordering milestones in a dog’s journey affects only that assignment, not its source path or another dog.
 - Progress belongs to a dog’s path assignment, keyed by path step, never to a global milestone template.
@@ -41,6 +42,10 @@ A trainer-facing dog-training demo for managing multiple dogs, reusable mileston
 - Local video blobs belong in IndexedDB, never localStorage or database JSON. Demonstration references belong to their editing scope; practice references belong only to a dog-assigned milestone.
 - If local video persistence fails, show an explicit error and offer a temporary preview that does not change the saved reference. Never imply that selecting a practice recording analyzes it.
 - Do not invent hand signals or show fake sharing, upload, or AI-analysis confirmations.
+- The Sit video is supplied sample footage, not generated footage. Keep it separate from personal demonstration/practice references and display the full portrait frame with controls and no autoplay.
+- Existing blank Sit fields can be filled only through explicit sample review and save for that dog; never overwrite trainer content or populate saved records automatically.
+- Sample feedback is prepared and simulated, never automated analysis. Retain the “Simulated sample feedback” source on editable notes and scope each note to its assigned dog and milestone.
+- Viewing videos/feedback or saving notes must never change progress. Celebrate only after a successful incomplete-to-completed save, never on reload or failed saves, and respect reduced motion.
 
 ## Product
 
