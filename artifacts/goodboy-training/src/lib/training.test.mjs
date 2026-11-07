@@ -1,6 +1,6 @@
 import test, { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { seedWorkspace, loadPrototype, resolveStep, ageLabel, mediaUrl } from './training.ts';
+import { seedWorkspace, loadPrototype, resolveStep, ageLabel, mediaUrl, foundationObjectives, foundationObjectiveExample, isExampleObjective } from './training.ts';
 
 const values = new Map();
 globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
@@ -57,4 +57,38 @@ test('malformed legacy data is not silently overwritten', () => {
   values.set('goodboy-prototype-v1', '{broken');
   assert.throws(() => loadPrototype());
   assert.equal(values.get('goodboy-prototype-v1'), '{broken');
+});
+test('new sample milestones get exactly the supplied example objectives, never invented signals or cues', () => {
+  for (const milestone of seedWorkspace().milestones) {
+    assert.equal(milestone.description, foundationObjectives[milestone.id]);
+    assert.equal(milestone.command, '');
+    assert.equal(milestone.handSignal, '');
+    assert.equal(milestone.instructions, '');
+    assert.equal(isExampleObjective(milestone.description), true);
+  }
+});
+test('existing v2 records retain blank objectives, IDs, progress and trainer customizations unchanged', () => {
+  const saved = seedWorkspace();
+  saved.milestones[0].description = '';
+  saved.milestones[1].description = 'Trainer-defined objective';
+  saved.milestones[0].handSignal = 'The trainer’s existing gesture';
+  saved.paths[0].steps[0].customization = { ...saved.milestones[0], command: 'My custom cue', description: 'Only this path' };
+  saved.assignments[0].progress['step-sit'] = 'completed';
+  const original = JSON.stringify(saved);
+  values.set('goodboy-prototype-v2', original);
+  assert.deepEqual(loadPrototype(), saved);
+  assert.equal(values.get('goodboy-prototype-v2'), original);
+});
+test('old sample blank objectives remain blank until a trainer reviews and saves an example', () => {
+  const original = JSON.stringify({ profile: { name: 'Raya', pathId: 'foundation' }, paths: [{ id: 'foundation', name: 'Foundation', description: '', skillIds: ['sit'] }], skills: [{ id: 'sit', name: 'Sit', command: 'Trainer cue', handSignal: 'Trainer gesture', instructions: 'Trainer guidance', status: 'in-progress' }] });
+  values.set('goodboy-prototype-v1', original);
+  const state = loadPrototype();
+  assert.equal(state.milestones[0].description, '');
+  assert.equal(foundationObjectiveExample('sit', 'Sit'), foundationObjectives.sit);
+  assert.equal(values.has('goodboy-prototype-v2'), false);
+  assert.equal(values.get('goodboy-prototype-v1'), original);
+});
+test('custom milestones named Sit are not silently treated as sample templates', () => {
+  assert.equal(foundationObjectiveExample('custom-id', 'Sit'), undefined);
+  assert.equal(foundationObjectiveExample('sit', 'Trainer renamed skill'), undefined);
 });

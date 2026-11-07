@@ -4,13 +4,27 @@ export type Status = 'not-started' | 'in-progress' | 'completed';
 export const statusLabel: Record<Status, string> = { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Completed' };
 export const newId = () => crypto.randomUUID();
 export const blankMilestone = (): MilestoneContent => ({ name: '', description: '', command: '', handSignal: '', instructions: '', category: 'Foundation', difficulty: 'Beginner', videoPath: '' });
+export const foundationObjectives: Readonly<Record<string, string>> = {
+  sit: 'Responds to the agreed sit cue and remains seated until released.',
+  stay: 'Remains in position for the duration and distance agreed with the trainer, until released.',
+  retrieve: 'Brings the agreed object back and releases it to the handler on cue.',
+  come: 'Returns to the handler on the agreed recall cue in the practice setting.',
+  heel: 'Walks beside the handler for the distance and position agreed with the trainer.',
+};
+export function foundationObjectiveExample(templateId: string, name: string): string | undefined {
+  return templateId === name.trim().toLowerCase() ? foundationObjectives[templateId] : undefined;
+}
+export function isExampleObjective(description: string): boolean {
+  return Object.values(foundationObjectives).includes(description.trim());
+}
 export function seedWorkspace(): TrainingWorkspace {
   const names = ['Sit', 'Stay', 'Retrieve', 'Come', 'Heel'];
   const ids = names.map(name => name.toLowerCase());
   return {
     version: 2,
     dogs: [{ id: 'raya', name: 'Raya', breed: 'Newfoundland', trainingType: 'Service dog in training', birthDate: '', handlerName: '', photo: '' }],
-    milestones: names.map((name, i) => ({ ...blankMilestone(), id: ids[i], name })),
+    // Defaults apply only to a fresh workspace, never when loading saved guest records.
+    milestones: names.map((name, i) => ({ ...blankMilestone(), id: ids[i], name, description: foundationObjectives[ids[i]] })),
     paths: [{ id: 'foundation', name: 'Foundation Skills', description: 'The everyday cues that build a shared language.', steps: ids.map(id => ({ id: `step-${id}`, templateId: id, customization: null })) }],
     assignments: [{ id: 'raya-foundation', dogId: 'raya', pathId: 'foundation', progress: {} }],
   };

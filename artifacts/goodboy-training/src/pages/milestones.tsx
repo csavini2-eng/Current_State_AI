@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Copy, Layers, Pencil, Plus, Search } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
-import { blankMilestone, newId, type MilestoneContent, type MilestoneTemplate } from '@/lib/training';
+import { blankMilestone, foundationObjectiveExample, isExampleObjective, newId, type MilestoneContent, type MilestoneTemplate } from '@/lib/training';
 import { Label, Loading, contentOf } from '@/components/shared';
 import { MilestoneEditor } from '@/components/milestone-editor';
 
@@ -43,7 +43,8 @@ export function MilestonesPage() {
         <h3>{m.name || 'Untitled skill'}</h3>
         <div><span className="chip">{m.category}</span> <span className="chip">{m.difficulty}</span></div>
         <p>{m.command ? `Cue: “${m.command}”` : 'Cue not added yet'}</p>
-        {m.description && <p>{m.description}</p>}
+        {m.description.trim() ? <p>{m.description}</p> : <button type="button" className="objective-edit" onClick={() => setEditor({ id: m.id, initial: contentOf(m) })}>Add a completion objective</button>}
+        {isExampleObjective(m.description) && <p className="hint">Example objective · tailor to each dog.</p>}
         <p>Used in {uses} {uses === 1 ? 'path' : 'paths'}</p>
         <div className="actions-row" style={{ marginTop: 'auto' }}>
           <button className="btn btn-quiet btn-small" onClick={() => setEditor({ id: m.id, initial: contentOf(m) })}><Pencil size={14} /> Edit</button>
@@ -51,6 +52,6 @@ export function MilestonesPage() {
         </div>
       </article>;
     })}</div> : <div className="empty-state"><Layers size={30} /><h2>{q ? 'No matching milestones' : 'The gallery is empty'}</h2><p>{q ? 'Try a different name.' : 'Create your first reusable skill.'}</p></div>}
-    {editor && <MilestoneEditor title={editor.id ? 'Edit milestone' : 'New milestone'} note={editor.id ? 'Changes update every path that uses the original, except paths with their own customized copy.' : undefined} initial={editor.initial} onClose={() => setEditor(null)} onSave={saveTemplate} />}
+    {editor && <MilestoneEditor title={editor.id ? 'Edit original milestone' : 'New milestone'} note={editor.id ? 'Changes update every path that uses the original, except paths with their own customized copy.' : 'This creates a reusable milestone in the gallery.'} initial={editor.initial} objectiveExample={editor.id ? foundationObjectiveExample(editor.id, editor.initial.name) : undefined} onClose={() => setEditor(null)} onSave={saveTemplate} />}
   </main>;
 }
