@@ -1,6 +1,6 @@
 import type { TrainingWorkspace, MilestoneContent, PathStep, DogProfile, DogAssignment, AssignedMilestone } from '@workspace/api-client-react';
 import { fillBlankSitFields } from './sample-sit.ts';
-export type { TrainingWorkspace, MilestoneContent, MilestoneTemplate, DogProfile, TrainingProgram, DogAssignment, PathStep, AssignedMilestone, SampleFeedbackNote } from '@workspace/api-client-react';
+export type { TrainingWorkspace, MilestoneContent, MilestoneTemplate, DogProfile, TrainingProgram, DogAssignment, PathStep, AssignedMilestone, SampleFeedbackNote, PracticeEntry, PracticeOutcome, PracticeFeedback } from '@workspace/api-client-react';
 export type Status = 'not-started' | 'in-progress' | 'completed';
 export const statusLabel: Record<Status, string> = { 'not-started': 'Not started', 'in-progress': 'In progress', completed: 'Completed' };
 export const newId = () => crypto.randomUUID();
@@ -48,7 +48,12 @@ export function createAssignment(state: TrainingWorkspace, dogId: string, pathId
   return { id, dogId, pathId, progress: {}, milestones: snapshotSteps(state, pathId) };
 }
 export function migrateAssignments(state: TrainingWorkspace): TrainingWorkspace {
-  return { ...state, assignments: state.assignments.map(a => a.milestones !== undefined ? a : { ...a, milestones: snapshotSteps(state, a.pathId) }) };
+  return { ...state, assignments: state.assignments.map(a => {
+    const milestones = a.milestones ?? snapshotSteps(state, a.pathId);
+    return { ...a, milestones: milestones.map(m => !m.practiceVideoPath || m.practiceEntries !== undefined ? m : {
+      ...m, practiceEntries: [{ id: `legacy-${m.id}`, milestoneId: m.id, createdAt: '', videoPath: m.practiceVideoPath, description: '', outcome: 'unsure' as const }],
+    }) };
+  }) };
 }
 export function assignmentMilestones(state: TrainingWorkspace, assignment: DogAssignment): AssignedMilestone[] {
   return assignment.milestones ?? snapshotSteps(state, assignment.pathId);

@@ -1,16 +1,16 @@
 import { useParams } from 'wouter';
-import { CircleDot, Lock, PawPrint, RefreshCw } from 'lucide-react';
+import { CircleDot, Dog as DogIcon, Lock, RefreshCw } from 'lucide-react';
 import { getGetHandlerPathQueryKey, useGetHandlerPath } from '@workspace/api-client-react';
 import { ageLabel, mediaUrl, statusLabel } from '@/lib/training';
 import raya from '../assets/raya-sample.jpg';
-import { StatusPill } from '@/components/shared';
+import { Brand, StatusPill } from '@/components/shared';
 
 export default function HandlerPage() {
   const { id = '' } = useParams<{ id: string }>();
   const q = useGetHandlerPath(id, { query: { refetchInterval: 15000, retry: false, queryKey: getGetHandlerPathQueryKey(id) } });
   const data = q.data;
   const status = (q.error as { status?: number } | null)?.status;
-  const brand = <div className="brand" style={{ pointerEvents: 'none' }}><span className="brand-symbol"><PawPrint size={20} /></span><span className="brand-name">GoodBoy</span></div>;
+  const brand = <Brand asLink={false} />;
   if (!data && q.isLoading) return <div className="handler-page" aria-busy="true">{brand}<div className="skeleton" style={{ marginTop: 20 }} /><div className="skeleton" /></div>;
   if (!data || status === 404 || status === 410 || status === 403) return <div className="handler-page">{brand}<div className="empty-state" style={{ marginTop: 24 }}>
     <Lock size={30} />
@@ -22,7 +22,7 @@ export default function HandlerPage() {
   return <div className="handler-page">
     <div className="handler-bar">{brand}<span className="live-pill" role="status"><CircleDot size={14} /> Live, read only{q.isError ? ' (reconnecting)' : ''}</span></div>
     <section className="card handler-hero">
-      <div className="avatar">{photo ? <img src={photo} alt={`${data.dog.name} portrait`} /> : <PawPrint size={44} />}</div>
+      <div className="avatar">{photo ? <img src={photo} alt={`${data.dog.name} portrait`} /> : <DogIcon size={44} />}</div>
       <div><span className="eyebrow">Handler guide{data.handlerName ? ` for ${data.handlerName}` : ''}</span><h1 style={{ margin: '4px 0' }}>{data.dog.name}</h1>
         <p className="hint" style={{ margin: 0 }}>{[data.dog.breed, ageLabel(data.dog.birthDate)].filter(Boolean).join(' · ')}</p>
         <h2 style={{ margin: '10px 0 0', fontSize: 22 }}>{data.pathName}</h2>{data.pathDescription && <p className="hint">{data.pathDescription}</p>}

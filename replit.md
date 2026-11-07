@@ -1,10 +1,10 @@
-# GoodBoy Training
+# Weenstone
 
-A trainer-facing dog-training demo for managing multiple dogs, reusable milestones, consistent instructions, and structured training paths. Existing private backend and live handler links remain available separately.
+A trainer-facing dog-training prototype with browser-local workspaces and explicit server-backed sharing of one dog’s assignment. Existing private-account workspaces and their access controls remain separate.
 
 ## Run & Operate
 
-- Open the **GoodBoy Training** web preview; its managed workflow runs the frontend.
+- Open the **Weenstone** web preview; its managed workflow runs the frontend. Internal artifact, package, record IDs, and storage keys intentionally keep their existing names.
 - `pnpm --filter @workspace/goodboy-training run typecheck` — typecheck the app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
@@ -17,18 +17,21 @@ A trainer-facing dog-training demo for managing multiple dogs, reusable mileston
 - Frontend: React, Vite, TypeScript, Wouter
 - Signed-in dog profiles, paths, templates, and per-dog progress: PostgreSQL, scoped to the signed-in trainer
 - Anonymous prototype: browser local storage, with legacy Raya data preserved and migrated
-- Photographs and demonstration videos: App Storage, with authenticated uploads and access-checked serving
+- Unshared guest photographs and videos: localStorage / IndexedDB. Explicitly shared assignment copies and media: PostgreSQL / App Storage with separate handler and management capabilities.
 
 ## Where things live
 
 - `artifacts/goodboy-training/src/App.tsx` — dog directory, profile, paths, journeys, and skill editor
 - `artifacts/goodboy-training/src/index.css` — app visual system and responsive styling
-- `artifacts/goodboy-training/src/assets/raya-sample.jpg` — replaceable generated sample portrait
-- `artifacts/api-server/` and `lib/` — shared workspace scaffolding; not used by GoodBoy’s local-only data flow
+- `artifacts/goodboy-training/src/assets/raya-sample.jpg` — user-supplied edited default portrait; never replace a dog’s explicitly uploaded photo
+- `artifacts/api-server/` and `lib/` — protected account services and the separately scoped guest-sharing service
 
 ## Architecture decisions
 
-- The public demo has no account prompts, real-sharing controls, or cloud-upload controls. Local demonstration and practice video selection/playback remain visible without sign-in.
+- The public demo has no account prompts. Unshared records remain local. Only explicit Create handler link / Update shared assignment copies the selected dog, assigned snapshot, and required media to the server.
+- Guest sharing uses distinct unguessable handler and management capabilities. Never expose the management capability in a URL or a shared snapshot. Retain it only in the trainer browser; do not log either capability.
+- Handlers may read the selected assignment and append practice attempts / simulated notes. They may not edit trainer instructions, dog details, progress, reusable paths, or gallery originals. Revocation must block reads and submissions, without cached handler fallbacks.
+- Importing shared submissions must preserve local content and progress. Publishing updated instructions must not overwrite newer handler reports or notes.
 - Existing private workspaces stay private; existing capability links still grant read-only access to one assigned dog/path.
 - Editing has three distinct scopes: gallery original, reusable-path customization, and dog-assigned snapshot. A dog’s journey defaults to editing only that dog’s assignment; never offer an ambiguous original-edit action there.
 - Individual dog journeys must not offer a reusable-path editing switch. Reusable paths are managed from Training Paths, and gallery originals from Milestone Gallery.
@@ -46,6 +49,9 @@ A trainer-facing dog-training demo for managing multiple dogs, reusable mileston
 - Existing blank Sit fields can be filled only through explicit sample review and save for that dog; never overwrite trainer content or populate saved records automatically.
 - Sample feedback is prepared and simulated, never automated analysis. Retain the “Simulated sample feedback” source on editable notes and scope each note to its assigned dog and milestone.
 - Viewing videos/feedback or saving notes must never change progress. Celebrate only after a successful incomplete-to-completed save, never on reload or failed saves, and respect reduced motion.
+- Personal practice recordings form append-only attempt history. Keep original videos and reports independent of progress. Notes remain editable/removable while retaining simulated source attribution and the original report.
+- Simulated personal feedback is deterministic, based only on the actual selected milestone and handler report/outcome. Missing, unrelated, contradictory, or unsupported reports require clarification. Never infer observations from video bytes or filenames.
+- Use the exact prototype disclosure once per feedback input/result area. Keep the bundled Sit sample separate from personal attempts.
 
 ## Product
 
@@ -54,14 +60,14 @@ In the guest demo trainers manage dog profiles, combine reusable milestones into
 ## User preferences
 
 - The user rejected the formal editorial appearance as depressing. Use brighter, friendly colors and approachable typography, with clear dog-information areas and a Duolingo-inspired connected training path.
-- The user approved the current brighter playful workspace and explicitly requested preserving its typography, colors, style, and layout while extending functionality.
-- Keep GoodBoy as the prototype’s working name while exploring alternatives.
+- Preserve the friendly typography, rounded cards, and winding journey. Apply approved Weenstone branding: forest #193D32, white #FFFFFF, mist #EDF1EF, navy #0C2340, olive #647332, restrained shadows, and the approved W-dog mark extracted from the supplied guide. Do not substitute a generic paw or invent a new logo.
 
 ## Gotchas
 
 - Anyone holding a handler link can read that specific dog/path; names label the intended handler but do not authenticate their identity. Trainers can revoke links.
-- Guest photographs and local videos stay in this browser. Cloud video upload and real-sharing controls are deferred from the public demo; do not replace them with fake successes.
-- Do not substitute an unrelated dog for Raya or invent her birthday. Keep her current photograph until the trainer uploads a replacement.
+- A shared link is not a full workspace backup. Changes remain local until the trainer updates that shared assignment. Clearing browser data can lose unshared records and management capabilities.
+- Sharing has prototype limits: supported image/video formats, 50 MB per file, 200 MB / 100 upload reservations per assignment, bounded creation/submission rates. A failed/interrupted upload must not activate a new handler link.
+- Do not substitute an unrelated dog for Raya or invent her birthday. Use the supplied edited Raya photograph as the default everywhere, but preserve explicit user-uploaded photos.
 
 ## Pointers
 
