@@ -1,6 +1,6 @@
 # GoodBoy Training
 
-A trainer-facing dog-training website for managing multiple dogs, reusable milestone templates, structured training paths, and live read-only handler guides.
+A trainer-facing dog-training demo for managing multiple dogs, reusable milestones, consistent instructions, and structured training paths. Existing private backend and live handler links remain available separately.
 
 ## Run & Operate
 
@@ -8,7 +8,8 @@ A trainer-facing dog-training website for managing multiple dogs, reusable miles
 - `pnpm --filter @workspace/goodboy-training run typecheck` — typecheck the app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- The API uses PostgreSQL, managed sign-in, and App Storage. Anonymous trainer records remain browser-local; sign-in enables private cloud records, persistent videos, and live sharing.
+- The public demo always uses guest browser storage, without mounting authentication or loading private account records, even if the browser has an existing signed-in session. It must work without authentication configuration.
+- The API retains PostgreSQL, managed authentication, App Storage, and its existing private access controls. Do not weaken these to enable demo interactions.
 
 ## Stack
 
@@ -27,16 +28,19 @@ A trainer-facing dog-training website for managing multiple dogs, reusable miles
 
 ## Architecture decisions
 
-- The trainer workspace is private; handlers open a live, read-only link for one assigned dog/path without signing in.
+- The public demo has no account prompts, real-sharing controls, or persistent video-upload controls. Keep only the small demo notice explaining browser-local storage and data-clear risk.
+- Existing private workspaces stay private; existing capability links still grant read-only access to one assigned dog/path.
 - Milestones are reusable templates. Editing an original affects linked steps; customizing for one path stores an independent override on that path.
 - Progress belongs to a dog’s path assignment, keyed by path step, never to a global milestone template.
-- Workspace saves use revision checks to prevent stale tabs overwriting newer records. Anonymous records stay local until saved after sign-in.
+- Private workspace saves retain revision checks. Guest records keep their existing storage keys and are never reset or replaced during this update.
 - Seed milestones as illustrative and not started; trainers alone control status changes.
-- Keep the simulated skill example distinct from live AI behavior.
+- Use the description field as the completion objective. New Foundation samples use the user-supplied example objectives, clearly labeled for tailoring; existing blank objectives require explicit trainer review/save, never silent backfilling.
+- Instruction dialogs are read-only, keyboard accessible, Escape-dismissable, and restore focus. Neither viewing nor editing instructions changes progress.
+- Do not invent hand signals or show fake sharing, upload, or AI-analysis confirmations.
 
 ## Product
 
-Trainers manage dog profiles (including date of birth, calculated age, and assigned handler), combine reusable milestones into paths, assign paths to dogs, track each dog’s progress, and share live approved guidance with handlers.
+In the guest demo trainers manage dog profiles, combine reusable milestones into paths, assign paths to dogs, review completion criteria and instructions, and track each dog’s progress without signing in.
 
 ## User preferences
 
@@ -47,7 +51,7 @@ Trainers manage dog profiles (including date of birth, calculated age, and assig
 ## Gotchas
 
 - Anyone holding a handler link can read that specific dog/path; names label the intended handler but do not authenticate their identity. Trainers can revoke links.
-- Anonymous photograph uploads are local; persistent videos and live sharing require sign-in. Imported photographs are moved to App Storage before cloud save.
+- Guest photograph selection stays local. Persistent video and real-sharing controls are deferred from the current public demo; do not replace them with fake successes.
 - Do not substitute an unrelated dog for Raya or invent her birthday. Keep her current photograph until the trainer uploads a replacement.
 
 ## Pointers
