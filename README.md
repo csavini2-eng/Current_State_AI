@@ -1,38 +1,35 @@
-# GoodBoy
+# Weenstone
 
-**GoodBoy is a training journey tool that helps trainers and dog handlers follow the same plan for a service dog in training.**
+Weenstone helps trainers and handlers follow the same dog-specific training plan, record practice, and understand progress. It is designed for trainers coordinating with handlers of working or service dogs in training.
 
-## What this slice lets a user do
+**Submission status:** documentation draft added; current Replit source/assets and the demo video still need to be synchronized or added before submission.
 
-- Add a new dog (name, breed, type, handler). Saving with no name is blocked with a message.
-- Assign a training path (for example "Foundation Skills") to that dog.
-- Open the dog's journey and set each milestone to Not started, In progress, or Completed. A counter shows how many are completed.
-- Use "Share With Handler" to give the handler a read-only view of the dog's journey.
+## Try the prototype
 
-## Open the prototype
+[Open Weenstone](https://good-boy-dog-training-platform.replit.app/). No account is required for the guest demo. Open Raya or add a sample dog, assign Foundation Skills, and choose View instructions. Use only sample information during evaluation.
 
-Live app: https://good-boy-dog-training-platform.replit.app
+Unshared records remain in the current browser. Creating a handler link saves a shared copy to the server. Later trainer edits require Update shared assignment. Keep the management browser available to update or revoke the link.
 
-Open the link and use **Add New Dog**. No sign-in is needed to try it, and records are saved only in your browser. Signing in is needed for saved video uploads and handler links.
+## Current functionality and AI status
 
-## AI (simulated for now)
+The November 7, 2026 browser review observed that the live app supports dog profiles, assigned paths, dog-specific editing, progress actions, and a clearly labeled prepared Sit-feedback example. The review verified creating, opening and revoking a handler link. Practice-video controls and a handler submission flow are present, but personal uploads and trainer-side receipt still need an end-to-end check.
 
-The AI is **simulated for now**. It is not connected to a real model yet.
+The intended AI feature would help handlers review practice against the trainer's plan. The demonstrated feedback is simulated; the reviewed Sit example uses prepared observations. These tests do not establish video-analysis accuracy, model reliability, or training effectiveness.
 
-The planned behavior: the handler (the dog owner, not the trainer) uploads a training video. The AI tells them what they are doing right and what to improve. It also gives suggestions, such as flagging when a milestone is taking longer than usual.
+## Code and assets
 
-## Test results
+Prototype source is organized under `artifacts/goodboy-training`, backend source under `artifacts/api-server`, and shared packages under `lib`. Internal GoodBoy package and folder names may remain for compatibility.
 
-These three tests were run on the live app.
+**Before submission: sync the revised Replit code and required assets into this repository.** The November 8 repository check still found the earlier GoodBoy implementation. The browser observations in these documents concern the live Replit app reviewed November 7, not the older source currently in this repository. Documentation alone does not resolve this mismatch.
 
-| Test | Input | Expected | Result |
-| --- | --- | --- | --- |
-| Typical | Add dog "Biscuit" (Labrador, Service dog in training, handler Maria), assign the Foundation Skills path, set Sit to Completed | Dog saved, journey shows 5 milestones, counter updates | Pass. The profile saved, 5 milestones showed, and the completed counter updated. |
-| Challenge | Mark Retrieve as Completed while Stay is still Not started | App handles an out-of-order milestone sensibly | Partial. It allowed the change and updated the counter, with no warning about the order. |
-| Invalid / empty | Save a new dog with an empty name | Dog is not saved and the user sees an error | Pass. "Add the dog's name." appeared and nothing was saved. |
+## Revision and evaluation
 
-## Known limitations
+- [Priority improvements, peer response, tests, comparison, risk, and next priorities](revision.md)
+- [Draft AI-use disclosure](ai-use-disclosure.md)
+- [Demo speaking notes](demo-script.md)
+- [Submission checklist](submission-checklist.md)
+- [Historical First Working Slice README and original tests](docs/first-working-slice.md)
 
-1. Data is saved only in the current browser unless the user signs in. Video upload and handler links also need sign-in.
-2. The AI feedback is simulated. Nothing analyzes videos yet.
-3. No guidance on milestone order, and some fields show placeholders (for example "Cue not added yet"). The Foundation Skills path and the dog Raya are sample data.
+## Demo Video
+
+**Not yet added.** Record a narrated 2–3 minute draft, upload it to Google Drive, and replace this paragraph with its viewing link. Grant viewer access to Emelia Hughes (ehughes8@nd.edu) and Samuel Huang (ghuang3@nd.edu). Upload the same video file directly to Canvas with the repository URL.
