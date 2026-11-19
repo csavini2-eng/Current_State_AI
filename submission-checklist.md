@@ -14,10 +14,12 @@ Due November 19, 2026. This round is the revised-prototype milestone. The final-
 - [ ] Ask a trainer/handler or classmate to try the flow and explain the note. Record their actual interpretation, rather than only whether a button worked. This strengthens usefulness evidence; do not invent participant results.
 - [ ] Review the five-case table, historical before-and-after comparison, interpretation and concrete risk response.
 - [ ] Record source/permission and required attribution for bundled footage and imagery. Do not assume a watermark preview grants publication permission. Do not add the earlier Give paw preview unless it is actually used and permitted.
-- [ ] Record a 2–3 minute narrated demo showing user/problem, central task, revision/evidence, AI status, limitation and next step.
-- [ ] Upload the demo to Google Drive and verify playback.
-- [ ] Grant viewer access to Emelia Hughes, ehughes8@nd.edu, and Samuel Huang, ghuang3@nd.edu.
-- [ ] Add the actual Drive viewing link under Demo Video in README. Remove the Not yet added text only after doing so.
+- [x] Record a draft demo (reported complete by Catherine; uploaded video file confirmed November 19).
+- [ ] Confirm the recording is 2–3 minutes and shows user/problem, central task, revision/evidence, AI status, limitation and next step.
+- [x] Upload the demo to Google Drive: [Weenstone_Demo_Draft.mp4](https://drive.google.com/file/d/1DPQXHsJ1sobgcabI_27ognZXAfjHWPTW/view?usp=sharing).
+- [ ] Verify video playback, audible narration and readable text.
+- [x] Confirm access for Emelia Hughes, ehughes8@nd.edu, and Samuel Huang, ghuang3@nd.edu (both have access; checked November 19).
+- [x] Add the actual Drive viewing link under Demo Video in README.
 - [ ] Open the repository signed out or in a private browser. Confirm current code, assets, all documentation links and prototype access.
 - [ ] Check that public files do not contain credentials, real client information, handler tokens or management keys.
 - [ ] Submit BOTH the public GitHub URL and the same demo video file in ONE Canvas assignment submission.
@@ -28,4 +30,4 @@ Give a tester no navigation instructions initially. Ask them to find the dog's n
 
 ## Status of this package
 
-These repository files are drafts based on the project conversation and assisted browser observations. They contain documentation only, not the latest Replit source or a recorded demo. No Drive video or Canvas submission has been completed through this update. Catherine should review the disclosure in her own words before submission.
+These repository files are drafts based on the project conversation and assisted browser observations. The recorded demo is uploaded to Drive and linked from README. Current Replit source synchronization and the Canvas submission still need confirmation. Catherine should review the disclosure in her own words before submission.
