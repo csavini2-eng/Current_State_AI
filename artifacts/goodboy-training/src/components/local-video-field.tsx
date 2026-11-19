@@ -3,6 +3,8 @@ import { Eye, Trash2, Upload } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
 import { mediaUrl } from '@/lib/training';
 import { LOCAL_VIDEO_PREFIX, readLocalVideo, saveLocalVideo } from '@/lib/local-videos';
+import { readGuestMedia } from '@/lib/guest-sharing';
+import { SHARED_VIDEO_PREFIX } from './authorized-video';
 
 type Load = 'empty' | 'loading' | 'ready' | 'missing' | 'unavailable' | 'expired' | 'unsupported' | 'storage-error';
 
@@ -31,6 +33,13 @@ export function LocalVideoField({ label, value, scopeNote, onChange, kind = 'dem
         if (!rec) { setLoad('missing'); return; }
         created = URL.createObjectURL(rec.file); setSrc(created); setLoad('ready');
       }).catch(() => { if (alive) setLoad('storage-error'); });
+    } else if (value.startsWith(SHARED_VIDEO_PREFIX)) {
+      // Shared media is read only through the guest-sharing service capability; never through private mediaUrl.
+      setLoad('loading'); setSrc('');
+      readGuestMedia(value).then(blob => {
+        if (!alive) return;
+        created = URL.createObjectURL(blob); setSrc(created); setLoad('ready');
+      }).catch(() => { if (alive) setLoad('unavailable'); });
     } else if (value.startsWith('blob:')) { setSrc(value); setLoad('ready'); }
     else { setSrc(mediaUrl(value)); setLoad('ready'); }
     return () => { alive = false; if (created) URL.revokeObjectURL(created); };
@@ -85,7 +94,7 @@ export function LocalVideoField({ label, value, scopeNote, onChange, kind = 'dem
     {load === 'unsupported' && <p className="video-msg">The video is stored, but this browser cannot play its format. Try a supported MP4 or WebM file. Your saved reference is unchanged.</p>}
     {load === 'missing' && <p className="video-msg">This video is no longer stored in this browser. Choose a file to replace it.</p>}
     {load === 'storage-error' && <p className="video-msg">The browser could not read local video storage. Your saved reference is unchanged. Try reloading or select a file for a temporary preview.</p>}
-    {load === 'unavailable' && <p className="video-msg">This video is private or unavailable in demo mode. It has not been changed.</p>}
+    {load === 'unavailable' && <p className="video-msg">This video is unavailable here (it may be private or its shared link was revoked). The reference has not been changed.</p>}
     {load === 'expired' && <p className="video-msg">This older video link has expired and can no longer play. The reference is kept; choose a file to replace it.</p>}
     {load === 'empty' && !tempUrl && <p className="video-msg quiet">No video yet.</p>}
     {tempUrl && <div className="temp-preview">
@@ -100,6 +109,6 @@ export function LocalVideoField({ label, value, scopeNote, onChange, kind = 'dem
     </div>
     {error && <div className="error-text" role="alert"><p style={{ margin: 0 }}>{error}</p>
       {failedFile && <button type="button" className="btn btn-quiet btn-small" style={{ marginTop: 8 }} onClick={useTemp}><Eye size={15} /> Use temporary preview</button>}</div>}
-    <p className="hint">Videos selected here stay in this browser only and do not sync to other devices.{kind === 'practice' ? ' Selecting a practice video does not analyze it; there is no automated feedback.' : ''}</p>
+    <p className="hint">Videos selected here stay in this browser unless you share this assignment with a handler.</p>
   </div>;
 }

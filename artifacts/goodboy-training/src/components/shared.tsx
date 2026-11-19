@@ -1,7 +1,7 @@
 import { type ReactNode, useRef, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import * as Dialog from '@radix-ui/react-dialog';
-import { CheckCircle2, Circle, Dog as DogIcon, Layers, PawPrint, Play, Route as RouteIcon, Trash2, Upload, X } from 'lucide-react';
+import { CheckCircle2, Circle, Dog as DogIcon, Layers, Play, Route as RouteIcon, Trash2, Upload, X } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
 import { assignmentMilestones, mediaUrl, resolveStep, statusLabel, type DogProfile, type MilestoneContent, type MilestoneTemplate, type Status, type TrainingProgram, type TrainingWorkspace, type DogAssignment, type AssignedMilestone } from '@/lib/training';
 import rayaPortrait from '../assets/raya-sample.jpg';
@@ -18,7 +18,7 @@ export function ProgressBar({ done, total }: { done: number; total: number }) {
 }
 export function DogPhoto({ dog, size }: { dog: Pick<DogProfile, 'id' | 'name' | 'photo'>; size?: number }) {
   const src = dog.photo ? mediaUrl(dog.photo) : dog.id === 'raya' ? rayaPortrait : '';
-  if (!src) return <div className="photo-empty" role="img" aria-label={`${dog.name} has no photo yet`}><PawPrint size={size ?? 64} /></div>;
+  if (!src) return <div className="photo-empty" role="img" aria-label={`${dog.name} has no photo yet`}><DogIcon size={size ?? 64} /></div>;
   return <img src={src} alt={`${dog.name} portrait`} />;
 }
 export function contentOf(m: MilestoneContent): MilestoneContent {
@@ -36,14 +36,21 @@ export function assignmentStats(state: TrainingWorkspace, a: DogAssignment) {
 }
 export function templateById(state: TrainingWorkspace, id: string): MilestoneTemplate | undefined { return state.milestones.find((m) => m.id === id); }
 
-export function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
+export function Brand({ asLink = true }: { asLink?: boolean }) {
+  const inner = <><img className="brand-mark" src={`${import.meta.env.BASE_URL}weenstone-mark.png`} alt="" /><span className="brand-name">Weenstone</span></>;
+  return asLink ? <Link href="/" className="brand" aria-label="Weenstone home" data-testid="link-brand">{inner}</Link> : <div className="brand" aria-label="Weenstone">{inner}</div>;
+}
+
+/** One flexible scroll body, an optional fixed footer, Escape to close and focus return to the opener. */
+export function Modal({ title, context, onClose, children, footer, wide }: { title: string; context?: string; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
   const opener = useRef(document.activeElement instanceof HTMLElement ? document.activeElement : null);
   return <Dialog.Root open onOpenChange={open => { if (!open) onClose(); }}><Dialog.Portal>
     <Dialog.Overlay className="modal-back">
       <Dialog.Content className={`card modal ${wide ? 'wide' : ''}`} aria-describedby={undefined}
         onCloseAutoFocus={event => { event.preventDefault(); if (opener.current?.isConnected) opener.current.focus(); }}>
-        <div className="form-top"><Dialog.Title asChild><h2>{title}</h2></Dialog.Title><Dialog.Close asChild><button type="button" className="icon-btn" aria-label="Close"><X size={18} /></button></Dialog.Close></div>
-        {children}
+        <div className="form-top"><div style={{ minWidth: 0 }}>{context && <span className="modal-context">{context}</span>}<Dialog.Title asChild><h2>{title}</h2></Dialog.Title></div><Dialog.Close asChild><button type="button" className="icon-btn" aria-label="Close"><X size={18} /></button></Dialog.Close></div>
+        <div className="modal-body">{children}</div>
+        {footer && <div className="modal-foot">{footer}</div>}
       </Dialog.Content>
     </Dialog.Overlay>
   </Dialog.Portal></Dialog.Root>;
@@ -81,7 +88,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const act = (a: boolean) => (a ? 'active' : '');
   return <div className="app">
     <aside className="side">
-      <Link href="/" className="brand"><span className="brand-symbol"><PawPrint size={20} /></span><span className="brand-name">GoodBoy</span></Link>
+      <Brand />
       <nav className="side-nav" aria-label="Main navigation">
         <Link href="/dogs" className={act(location === '/' || location.startsWith('/dogs'))}><DogIcon size={19} /> My Dogs</Link>
         <Link href="/paths" className={act(location.startsWith('/paths') || location.startsWith('/journey'))}><RouteIcon size={19} /> Training Paths</Link>
@@ -89,7 +96,7 @@ export function Shell({ children }: { children: ReactNode }) {
       </nav>
     </aside>
     <div className="content">
-      <div className="main demo-notice" role="note"><strong>Demo mode · Records are saved in this browser.</strong><p>Records do not sync across devices and may be lost if browser data is cleared.</p></div>
+      <div className="main demo-notice" role="note"><strong>Demo mode · Unshared records stay in this browser.</strong><p>Dogs, paths, notes and videos you have not shared are saved only here, do not sync across devices and may be lost if browser data is cleared. When you create a handler link, a copy of that dog’s assignment and its media is saved on the server so the handler can open it.</p></div>
       {error && <div className="main" style={{ paddingBottom: 0, paddingTop: 20 }}><div className="banner bad" role="alert">{error}<button className="btn btn-small" onClick={() => void refresh()}>Reload records</button><button className="icon-btn" aria-label="Dismiss" onClick={() => setError('')}><X size={16} /></button></div></div>}
       {children}
     </div>

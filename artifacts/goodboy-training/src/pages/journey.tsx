@@ -2,14 +2,21 @@ import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { transitionProgress, type CompletionEvent } from '@/lib/progress';
 import { isSampleSit, SAMPLE_FEEDBACK_SOURCE } from '@/lib/sample-sit';
 import { Link, useLocation, useParams, useSearch } from 'wouter';
-import { ArrowDown, ArrowLeft, ArrowUp, Check, CheckCircle2, Circle, Pencil, Play, Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, CheckCircle2, Circle, Play, Plus } from 'lucide-react';
+import type { PracticeEntry } from '@workspace/api-client-react';
+import { saveLocalVideo } from '@/lib/local-videos';
+import { saveRemotePracticeNote } from '@/lib/guest-sharing';
+import { MilestoneCard } from '@/components/milestone-card';
+import { GuestShareControls } from '@/components/guest-share-controls';
+import { SHARED_VIDEO_PREFIX } from '@/components/authorized-video';
 import { useWorkspace } from '@/lib/workspace';
-import { assignmentMilestones, foundationObjectiveExample, isExampleObjective, newId, statusLabel, type AssignedMilestone, type MilestoneContent, type Status } from '@/lib/training';
+import { assignmentMilestones, foundationObjectiveExample, newId, statusLabel, type AssignedMilestone, type MilestoneContent, type Status } from '@/lib/training';
 import { Label, Loading, Modal, NotFoundCard, contentOf, stepItems, templateById } from '@/components/shared';
 import { MilestoneEditor } from '@/components/milestone-editor';
 import { MilestoneInstructions } from '@/components/milestone-instructions';
 
 type Item = { id: string; templateId: string; content: MilestoneContent; customized: boolean; practiceVideoPath: string };
+
 
 export function JourneyPage() {
   const { pathId } = useParams<{ pathId: string }>();
@@ -127,7 +134,25 @@ export function JourneyPage() {
   const height = items.length * STEP + 40;
   const trail = (pos: number[]) => pos.map((x, i) => { const y = i * STEP + 70; if (i === 0) return `M ${x} ${y}`; const py = (i - 1) * STEP + 70; const my = (py + y) / 2; return `C ${pos[i - 1]} ${my}, ${x} ${my}, ${x} ${y}`; }).join(' ');
   const pickList = state.milestones.filter((m) => m.name.toLowerCase().includes(q.toLowerCase()));
-  const editLabel = (name: string) => assignment ? `Edit ${name} for ${dogName}` : `Edit ${name} for this path`;
+  const editLabel = assignment ? `Edit for ${dogName}` : 'Edit for this path';
+  const addPracticeVideo = async (stepId: string, file: File) => {
+    if (!assignment) return false;
+    const ref = await saveLocalVideo(file);
+    const entry: PracticeEntry = { id: newId(), milestoneId: stepId, createdAt: new Date().toISOString(), videoPath: ref, description: '', outcome: 'unsure' };
+    const ok = await commitMilestone(assignment.id, stepId, (m) => ({ ...m, practiceEntries: [...(m.practiceEntries ?? []), entry] }));
+    if (!ok) throw new Error('The video was stored in this browser, but the practice entry could not be saved.');
+    return true;
+  };
+  const savePracticeEntry = async (stepId: string, entry: PracticeEntry) => {
+    if (!assignment) return false;
+    if (entry.feedback) {
+      await saveRemotePracticeNote(entry, entry.feedback.originalDescription, entry.feedback.outcome, entry.feedback.text, assignment.id);
+    }
+    return commitMilestone(assignment.id, stepId, (m) => {
+      const list = m.practiceEntries ?? [];
+      return { ...m, practiceEntries: list.some((e) => e.id === entry.id) ? list.map((e) => e.id === entry.id ? entry : e) : [...list, entry] };
+    });
+  };
   return <main className="main page-enter">
     <Link href={assignment ? `/dogs/${assignment.dogId}` : '/paths'} className="back" data-testid="link-back"><ArrowLeft size={15} /> {assignment ? `${dogName}’s profile` : 'Back to Training Paths'}</Link>
     <header className="top journey-top"><div><Label>{assignment ? `${dogName}’s training journey` : 'Reusable path'}</Label><h1>{path.name}</h1><p className="lede">{path.description || 'Add milestones to build this path.'}</p></div>
@@ -138,6 +163,7 @@ export function JourneyPage() {
         {mine.map((a) => <option key={a.id} value={a.dogId}>{state.dogs.find((d) => d.id === a.dogId)?.name ?? 'Dog'}’s journey</option>)}
       </select></>}
       {!assignment && <span className="tag">Reusable path editor</span>}
+      {assignment && <GuestShareControls assignmentId={assignment.id} dogName={dogName} pathName={path.name} small />}
       <button className="btn btn-quiet btn-small" style={{ marginLeft: 'auto' }} disabled={isSaving} onClick={() => setAdding(true)}><Plus size={15} /> {assignment ? `Add for ${dogName}` : 'Add milestones'}</button>
     </div>
     <div className="celebrate-status" role="status" aria-live="polite" data-testid="status-celebration">{celebration && <div className="celebrate-banner"><CheckCircle2 size={18} /><span>{celebration.message}{celebration.pathCompleted && <b> Training path completed. Great teamwork!</b>}</span></div>}</div>
@@ -154,43 +180,25 @@ export function JourneyPage() {
         return <div className={`node-wrap status-${st}${party ? ' just-done' : ''}`} key={item.id} style={{ '--step-x': `${xs[i]}%`, top: i * STEP + 70 } as CSSProperties}>
           <div className="node" role="img" aria-label={`Step ${i + 1}, ${statusLabel[st]}`}>{st === 'completed' ? <Check size={34} strokeWidth={3} /> : st === 'in-progress' ? <Play size={30} fill="currentColor" /> : <span>{i + 1}</span>}</div>
           {party && <div className="confetti" aria-hidden="true">{Array.from({ length: 14 }, (_, k) => <i key={k} style={{ '--k': k } as CSSProperties} />)}</div>}
-          <div className={`node-card card ${xs[i] > 50 ? 'to-left' : 'to-right'}`}>
-            <h3>{name}</h3>
-            {content.description.trim()
-              ? <p className="milestone-objective">{content.description}</p>
-              : <button type="button" className="objective-edit" onClick={() => setEditorId(item.id)}>Add a completion objective</button>}
-            {isExampleObjective(content.description) && <span className="objective-example">Example · tailor to this dog</span>}
-            {item.customized && <span className="tag">Path copy</span>}
-            <button type="button" className="btn btn-quiet btn-small instructions-button" aria-label={`View instructions for ${name}`} onClick={event => { event.currentTarget.focus({ preventScroll: true }); setInstructionsId(item.id); }}>View instructions</button>
-            {assignment && <div className="progress-controls" data-testid={`progress-${item.id}`}>
-              <span className={`pill pill-${st}`}>{st === 'completed' && <Check size={12} strokeWidth={3} />}{statusLabel[st]}</span>
-              {st === 'not-started' && <button type="button" className="btn btn-small" disabled={isSaving} onClick={() => void setStatus(item.id, 'in-progress')}>Start practicing</button>}
-              {st === 'in-progress' && <><button type="button" className="btn btn-quiet btn-small" onClick={(e) => { e.currentTarget.focus({ preventScroll: true }); setInstructionsId(item.id); }}>Continue practicing</button><button type="button" className="btn btn-small btn-done" disabled={isSaving} onClick={() => void setStatus(item.id, 'completed')}>Mark completed</button></>}
-              {st === 'completed' && <button type="button" className="btn btn-quiet btn-small" disabled={isSaving} onClick={() => void setStatus(item.id, 'in-progress')}>Practice again</button>}
-              {st !== 'not-started' && <button type="button" className="link-btn" disabled={isSaving} onClick={() => void setStatus(item.id, 'not-started')}>Reset to not started</button>}
-            </div>}
-            <div className="step-actions">
-              <button className="icon-btn" aria-label={`Move ${name} earlier`} disabled={isSaving || i === 0} onClick={() => move(i, -1)}><ArrowUp size={14} /></button>
-              <button className="icon-btn" aria-label={`Move ${name} later`} disabled={isSaving || i === items.length - 1} onClick={() => move(i, 1)}><ArrowDown size={14} /></button>
-              <button className="icon-btn" title={editLabel(name)} aria-label={editLabel(name)} disabled={isSaving} onClick={() => setEditorId(item.id)}><Pencil size={14} /></button>
-              {item.customized && <button className="icon-btn" title="Use gallery milestone again" aria-label={`Reset ${name} to the gallery milestone`} disabled={isSaving} onClick={() => resetCustom(item.id)}><RotateCcw size={14} /></button>}
-              <button className="icon-btn" aria-label={`Remove ${name}`} disabled={isSaving} onClick={() => remove(item.id, name)}><Trash2 size={14} /></button>
-            </div>
-          </div>
+          <MilestoneCard content={content} status={assignment ? st : undefined} side={xs[i] > 50 ? 'to-left' : 'to-right'} busy={isSaving}
+            isFirst={i === 0} isLast={i === items.length - 1} customized={item.customized} editLabel={editLabel}
+            removeLabel={assignment ? `Remove from ${dogName}’s path` : 'Remove from this path'}
+            onView={() => setInstructionsId(item.id)} onEdit={() => setEditorId(item.id)} onMove={(d) => move(i, d)} onRemove={() => remove(item.id, name)}
+            onStatus={assignment ? (next) => void setStatus(item.id, next) : undefined} onResetCustom={assignment ? undefined : () => resetCustom(item.id)} />
         </div>;
       })}
     </section> : <div className="empty-state"><Circle size={30} /><h2>A path with room to grow</h2><p>Pick milestones from your gallery to start this journey.</p><button className="btn" onClick={() => setAdding(true)}><Plus size={16} /> Add milestones</button></div>}
-    {items.length > 0 && <p className="hint" style={{ textAlign: 'center' }}>{assignment ? `Pencil edits ${dogName}’s version only.` : 'Pencil edits this reusable path only. Edit gallery originals in the Milestone Gallery.'}</p>}
+    {items.length > 0 && <p className="hint" style={{ textAlign: 'center' }}>{assignment ? `Edits from each card’s More menu change ${dogName}’s version only.` : 'Edits change this reusable path only. Edit gallery originals in the Milestone Gallery.'}</p>}
     {adding && <Modal title={assignment ? `Add milestones for ${dogName}` : 'Add milestones to the path'} onClose={() => setAdding(false)}>
       <p className="scope-note" role="note">{scopeNote}</p>
       <div className="field"><input aria-label="Search milestones" placeholder="Search by name" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <div className="modal-scroll">{pickList.length ? pickList.map((m) => <label className="check" key={m.id} style={{ padding: '8px 0' }}><input type="checkbox" checked={chosen.includes(m.id)} onChange={() => setChosen((c) => c.includes(m.id) ? c.filter((x) => x !== m.id) : [...c, m.id])} /> {m.name || 'Untitled skill'}{items.some((s) => s.templateId === m.id) && <span className="tag">Already included</span>}</label>) : <p className="hint">No milestones found. <Link href="/milestones">Create one in the gallery.</Link></p>}</div>
       <div className="form-actions"><button className="btn btn-quiet" onClick={() => go('/milestones')}>Open gallery</button><button className="btn" disabled={!chosen.length || isSaving} onClick={() => void addChosen()}>Add {chosen.length || ''} {assignment ? `for ${dogName}` : 'to path'}</button></div>
     </Modal>}
-    {shown && <MilestoneInstructions content={shown.content} templateId={shown.templateId}
+    {shown && <MilestoneInstructions content={shown.content} templateId={shown.templateId} dogName={assignment ? dogName : undefined}
       note={assignment ? { dogName, value: snapshot.find((m) => m.id === shown.id)?.sampleFeedbackNote, onSave: (t) => saveNote(shown.id, t), onRemove: () => saveNote(shown.id, null) } : undefined} scopeNote={scopeNote} onClose={() => setInstructionsId(null)}
       onDemoChange={(ref) => assignment ? commitMilestone(assignment.id, shown.id, (m) => ({ ...m, content: { ...m.content, videoPath: ref } })) : commitPathDemo(shown.id, ref)}
-      practice={assignment ? { dogName, value: shown.practiceVideoPath, onChange: (ref) => commitMilestone(assignment.id, shown.id, (m) => ({ ...m, practiceVideoPath: ref })) } : undefined} />}
-    {editItem && <MilestoneEditor title={editLabel(editItem.content.name || 'skill')} note={scopeNote} initial={contentOf(editItem.content)} objectiveExample={foundationObjectiveExample(editItem.templateId, editItem.content.name)} templateId={editItem.templateId} offerSample={!!assignment && isSampleSit(editItem.templateId, editItem.content)} onClose={() => setEditorId(null)} onSave={(c) => updateContent(editItem.id, () => c)} />}
+      practice={assignment ? { entries: snapshot.find((m) => m.id === shown.id)?.practiceEntries ?? [], disabled: isSaving, storageHint: 'Practice videos are kept in this browser unless this assignment is shared.', onAddVideo: (f) => addPracticeVideo(shown.id, f), onSaveEntry: (e) => savePracticeEntry(shown.id, e) } : undefined} />}
+    {editItem && <MilestoneEditor title={assignment ? `Edit ${editItem.content.name || 'skill'} for ${dogName}` : `Edit ${editItem.content.name || 'skill'} for this path`} note={scopeNote} initial={contentOf(editItem.content)} objectiveExample={foundationObjectiveExample(editItem.templateId, editItem.content.name)} templateId={editItem.templateId} offerSample={!!assignment && isSampleSit(editItem.templateId, editItem.content)} onClose={() => setEditorId(null)} onSave={(c) => updateContent(editItem.id, () => c)} />}
   </main>;
 }

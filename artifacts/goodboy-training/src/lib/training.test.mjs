@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { seedWorkspace, loadPrototype, resolveStep, ageLabel, mediaUrl, foundationObjectives, foundationObjectiveExample, isExampleObjective, createAssignment, migrateAssignments, assignmentMilestones } from './training.ts';
 import { fillBlankSitFields, isSampleSit, SAMPLE_SIT_CUE, SAMPLE_SIT_OBJECTIVE, SAMPLE_SIT_INSTRUCTIONS, SAMPLE_FEEDBACK_DISCLOSURE, SAMPLE_FEEDBACK_SOURCE, SAMPLE_FEEDBACK_TEXT } from './sample-sit.ts';
 import { transitionProgress } from './progress.ts';
+import { simulatePractice, PRACTICE_DISCLOSURE } from '../../../../lib/api-zod/src/simulation.ts';
 
 const values = new Map();
 globalThis.localStorage = { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
@@ -192,7 +193,7 @@ test('existing blank Sit records and personal clips are not silently populated o
   const original = JSON.stringify(state);
   values.set('goodboy-prototype-v2', original);
   const loaded = loadPrototype();
-  assert.deepEqual(loaded, state);
+  assert.deepEqual(loaded, migrateAssignments(state));
   assert.equal(loaded.assignments[0].milestones[0].content.command, '');
   assert.equal(values.get('goodboy-prototype-v2'), original);
 });
@@ -245,8 +246,60 @@ test('sample notes persist with source and remain independent of progress, video
   assert.deepEqual(loaded.assignments[0].progress, originalProgress);
   assert.equal(loaded.assignments[1].milestones[0].sampleFeedbackNote, undefined);
   const done = transitionProgress(loaded, a.id, 'step-sit', 'completed');
-  assert.deepEqual(done.next.assignments[0].milestones[0], a.milestones[0]);
+  assert.deepEqual(done.next.assignments[0].milestones[0], loaded.assignments[0].milestones[0]);
   delete loaded.assignments[0].milestones[0].sampleFeedbackNote;
   assert.equal(loaded.assignments[0].milestones[0].practiceVideoPath, 'local-video:practice');
   assert.equal(loaded.assignments[1].milestones[0].sampleFeedbackNote, undefined);
+});
+test('legacy practice media gains one history entry without changing its original reference or duplicating on migration', () => {
+  const state = seedWorkspace(), step = state.assignments[0].milestones[0];
+  step.practiceVideoPath = 'local-video:original-attempt';
+  const original = structuredClone(step);
+  const migrated = migrateAssignments(state);
+  const result = migrated.assignments[0].milestones[0];
+  assert.equal(result.practiceVideoPath, original.practiceVideoPath);
+  assert.equal(result.practiceEntries.length, 1);
+  assert.equal(result.practiceEntries[0].videoPath, original.practiceVideoPath);
+  assert.equal(result.practiceEntries[0].milestoneId, original.id);
+  assert.deepEqual(migrateAssignments(migrated), migrated);
+  assert.equal(state.assignments[0].milestones[0].practiceEntries, undefined);
+});
+test('report-based simulation varies by outcome and quotes actual trainer instructions without inspecting footage', () => {
+  const content = seedWorkspace().milestones[0];
+  const responded = simulatePractice(content, 'After the sit cue the dog responded and remained seated.', 'responded');
+  const prompting = simulatePractice(content, 'I needed additional prompting after giving the sit cue.', 'prompting');
+  const incomplete = simulatePractice(content, 'After the sit cue the attempt did not complete.', 'incomplete');
+  for (const result of [responded, prompting, incomplete]) {
+    assert.equal(result.needsClarification, false);
+    assert.match(result.text, /You reported:/);
+    assert.ok(result.text.includes(content.instructions));
+    assert.doesNotMatch(result.text, /I (saw|detected|analyzed)|certified|mastered/);
+  }
+  assert.notEqual(responded.text, prompting.text);
+  assert.notEqual(prompting.text, incomplete.text);
+  assert.match(PRACTICE_DISCLOSURE, /video has not been automatically analyzed/);
+});
+test('missing, ambiguous, unrelated and unsupported reports request clarification instead of inventing observations', () => {
+  const content = seedWorkspace().milestones[0];
+  const cases = [
+    ['', 'responded'], ['Good dog', 'responded'], ['The dog chased a squirrel across the garden.', 'responded'],
+    ['Quarterly revenue projections increased significantly.', 'responded'],
+    ['The dog was limping during the sit practice.', 'incomplete'],
+    ['I am not sure what happened after the cue.', 'unsure'],
+    ['The dog did not complete the sit attempt.', 'responded'],
+  ];
+  for (const [report, outcome] of cases) {
+    const result = simulatePractice(content, report, outcome);
+    assert.equal(result.needsClarification, true, report);
+    assert.match(result.text, /Clarification needed/);
+  }
+  assert.equal(simulatePractice({ ...content, instructions: '' }, 'I gave the sit cue and the dog responded.', 'responded').needsClarification, true);
+});
+test('custom milestones use their own objective and trainer plan rather than a fixed Sit response', () => {
+  const skill = { name: 'Open cabinet', command: 'Cabinet', description: 'Pull the cabinet handle using the agreed aid.', instructions: 'Use the trainer-approved handle; stop and ask before changing equipment.' };
+  const result = simulatePractice(skill, 'The cabinet handle attempt needed additional prompting.', 'prompting');
+  assert.equal(result.needsClarification, false);
+  assert.ok(result.text.includes('Open cabinet'));
+  assert.ok(result.text.includes(skill.instructions));
+  assert.doesNotMatch(result.text, /raised hand|standing to sitting/);
 });

@@ -3,6 +3,7 @@ import { useAuth } from '@clerk/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetTrainingWorkspace, useSaveTrainingWorkspace, requestUploadUrl, confirmUpload, type UploadInput, type TrainingWorkspace } from '@workspace/api-client-react';
 import { loadPrototype, seedWorkspace, migrateAssignments } from './training';
+import { pullSharedHistory } from './guest-sharing';
 
 async function prepareImage(file: Blob): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
@@ -44,7 +45,16 @@ export function GuestWorkspaceProvider({ children }: { children: ReactNode }) {
   const blocked = useRef(true);
   const refresh = async () => {
     try {
-      setState(loadPrototype()); blocked.current = false; setError('');
+      const local = loadPrototype();
+      blocked.current = false;
+      setState(local); setError('');
+      try {
+        const merged = await pullSharedHistory(local, loadPrototype);
+        if (merged !== local) localStorage.setItem('goodboy-prototype-v2', JSON.stringify(merged));
+        setState(merged);
+      } catch (syncError) {
+        setError(`Local records are intact. Shared submissions could not be refreshed: ${syncError instanceof Error ? syncError.message : 'Please try again.'}`);
+      }
     } catch (error) {
       blocked.current = true;
       setError(error instanceof Error ? error.message : 'Browser storage is unavailable. Existing records have not been changed.');

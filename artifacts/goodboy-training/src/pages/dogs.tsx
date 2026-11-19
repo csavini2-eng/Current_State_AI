@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from 'wouter';
 import { ArrowLeft, ArrowRight, Map, Pencil, Plus, Save, Trash2, Dog as DogIcon } from 'lucide-react';
 import { useWorkspace } from '@/lib/workspace';
 import { ageLabel, createAssignment, newId, type DogProfile } from '@/lib/training';
+import { GuestShareControls } from '@/components/guest-share-controls';
 import { DogPhoto, Label, Loading, Modal, NotFoundCard, ProgressBar, UploadField, assignmentStats } from '@/components/shared';
 
 const today = () => new Date().toLocaleDateString('sv');
@@ -116,6 +117,7 @@ export function DogProfilePage() {
           <h3 style={{ margin: 0 }}>{s.path.name}</h3><ProgressBar done={s.done} total={s.total} /><p className="hint">{s.done} of {s.total} completed · {s.active} in progress</p>
           <div className="actions-row" style={{ marginTop: 0 }}>
             <Link href={`/journey/${s.path.id}?dog=${dog.id}`} className="btn btn-small"><Map size={15} /> Open journey</Link>
+            <GuestShareControls assignmentId={a.id} dogName={dog.name} pathName={s.path.name} small />
             <button className="icon-btn" aria-label={`Remove ${s.path.name}`} disabled={busy} onClick={() => void unassign(a.id, s.path!.name)}><Trash2 size={15} /></button>
           </div></div>; })}
         {free.length > 0 ? <div className="actions-row"><select className="inline-select" aria-label="Path to assign" value={pick} onChange={(e) => setPick(e.target.value)}><option value="">Choose a path</option>{free.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>

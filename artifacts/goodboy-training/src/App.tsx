@@ -12,6 +12,7 @@ import { PathsPage } from '@/pages/paths';
 import { JourneyPage } from '@/pages/journey';
 import { MilestonesPage } from '@/pages/milestones';
 import HandlerPage from '@/pages/handler';
+import SharedHandlerPage from '@/pages/shared-handler';
 
 const queryClient = new QueryClient();
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -23,6 +24,7 @@ function AppRoutes() {
   return <RoutedErrorBoundary><Switch>
     {/* Existing capability links still use the access-controlled API, never guest records. */}
     <Route path="/handler/:id" component={HandlerPage} />
+    <Route path="/shared/:token" component={SharedHandlerPage} />
     <Route path="/sign-in/*?"><Redirect to="/" /></Route>
     <Route path="/sign-up/*?"><Redirect to="/" /></Route>
     <Route><Shell><Switch>
