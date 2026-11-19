@@ -2,7 +2,7 @@
 
 Weenstone helps trainers and handlers follow the same dog-specific training plan, record practice, and understand progress. It is designed for trainers coordinating with handlers of working or service dogs in training.
 
-**Submission status:** documentation draft added; current Replit source/assets and the demo video still need to be synchronized or added before submission.
+**Submission status:** documentation and demo video link added. The latest Replit source/assets and remaining verification still need confirmation before submission.
 
 ## Try the prototype
 
@@ -32,4 +32,6 @@ Prototype source is organized under `artifacts/goodboy-training`, backend source
 
 ## Demo Video
 
-**Not yet added.** Record a narrated 2–3 minute draft, upload it to Google Drive, and replace this paragraph with its viewing link. Grant viewer access to Emelia Hughes (ehughes8@nd.edu) and Samuel Huang (ghuang3@nd.edu). Upload the same video file directly to Canvas with the repository URL.
+[Watch the Weenstone draft demo](https://drive.google.com/file/d/1DPQXHsJ1sobgcabI_27ognZXAfjHWPTW/view?usp=sharing)
+
+Google Drive access for Emelia Hughes and Samuel Huang was confirmed on November 19, 2026. The same video file must also be uploaded directly to Canvas alongside the repository URL; the Drive link alone does not complete the Canvas submission.
