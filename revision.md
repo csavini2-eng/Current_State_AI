@@ -1,6 +1,6 @@
 # Weenstone revision and evaluation
 
-Reviewed November 7, 2026. This record concerns the live Replit prototype. A ChatGPT-assisted browser walkthrough used synthetic data; it was not an independent user study. The November 8 GitHub check confirmed that the source was still behind the live app. These documents were added separately; sync the current Replit source before submission.
+Reviewed November 7, 2026. This record concerns the live Replit prototype. A ChatGPT-assisted browser walkthrough used synthetic data; it was not an independent user study. The November 8 GitHub check found the source behind the live app. The revised source and assets were subsequently merged on November 19 at [2d870ae](https://github.com/csavini2-eng/Current_State_AI/commit/2d870aefc60a5500d9d99595788ffce12dedadfe) and their presence was verified in GitHub. The five-case browser results below remain November 7 observations, not a fresh evaluation of the merge. Replit reported passing type checks, 27 regression tests and frontend/API builds for the merge; this documentation review did not independently rerun those checks.
 
 ## User problem and central task
 
@@ -81,10 +81,10 @@ A secondary privacy limitation is that anyone holding a handler link can access 
 | Personal-video storage, submissions and description-based simulated feedback | Controls present; end-to-end behavior not verified. |
 | Automatic interpretation of uploaded footage | Not demonstrated; do not claim implemented. |
 | Training outcomes, certification or readiness | Not evaluated or guaranteed. |
-| Live app source in public GitHub | Not current at review time. |
+| Revised source and assets in public GitHub | Synced November 19 at [2d870ae](https://github.com/csavini2-eng/Current_State_AI/commit/2d870aefc60a5500d9d99595788ffce12dedadfe); confirmed by repository inspection. This is separate from the November 7 browser evaluation. |
 
 ## Ranked next priorities
 
-1. Sync the revised code/assets to the same public GitHub repository and verify personal-video submission, feedback and trainer receipt using a second browser/device.
+1. Verify personal-video submission, feedback and trainer receipt using a second browser/device against the synced source. Code inspection confirms a deterministic, description-based simulation; end-to-end behavior remains unverified in this review.
 2. Ask one intended user to perform the central task and explain what the simulated note means. Record the result, including confusion or failure.
-3. Record the 2–3 minute demo, add the Drive link and required viewer access, and submit the video file plus repository URL in Canvas.
+3. Check the recorded demo for playback, narration and required content, then submit the video file plus repository URL in Canvas. The recording is linked in README and instructor access was confirmed November 19.

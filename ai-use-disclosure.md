@@ -30,7 +30,7 @@ Catherine challenged changes that made testing easier at the expense of the cent
 
 The November 7 assisted browser walkthrough checked dog creation, empty-name validation, assignment, progress persistence, sample-note editing and persistence, two-dog customization, feedback dismissal, handler-link opening and revocation. These actual observations are documented in revision.md.
 
-The personal-video picker could not be completed by the browser tool, so upload, arbitrary personal-recording feedback and trainer-side receipt remain unverified. The public GitHub snapshot was still older than the live app. Previous Replit Agent test reports and an earlier local patch build are development records, not current end-to-end evidence. Current source checks must be rerun after syncing the latest code.
+The personal-video picker could not be completed by the browser tool, so upload, arbitrary personal-recording feedback and trainer-side receipt remain unverified by that walkthrough. The revised source was synced November 19 at [2d870ae](https://github.com/csavini2-eng/Current_State_AI/commit/2d870aefc60a5500d9d99595788ffce12dedadfe); repository inspection confirmed the updated source and assets and preservation of the submission documents. Replit reported passing type checks, 27 regression tests and frontend/API builds for that merge. Those checks were not independently rerun in this review and do not replace an end-to-end handler submission test. Earlier build reports belong to earlier versions.
 
 ## AI inside the product
 
@@ -40,7 +40,7 @@ The personal-video picker could not be completed by the browser tool, so upload,
 
 **Intended future outputs:** observations about practice, clear uncertainty, and suggested points to review with the trainer.
 
-**Current demonstrated behavior:** the bundled Sit example returns prepared observations and limits; users can edit, save or dismiss the note. No live model or automatic interpretation of footage was demonstrated. A description-based simulation was requested for personal attempts, using the selected skill and what the handler reports; its actual implementation and outputs still need verification against the current Replit code.
+**Current demonstrated behavior:** the bundled Sit example returns prepared observations and limits; users can edit, save or dismiss the note. No live model or automatic interpretation of footage was demonstrated. November 19 source inspection confirmed a deterministic rules-based simulation in `lib/api-zod/src/simulation.ts` for personal attempts. It uses the selected milestone, handler description and reported outcome; it does not read video bytes or interpret footage. It requests clarification for missing, unsupported or conflicting reports and produces editable practice considerations for supported reports. The practice-entry UI offers save, edit and dismiss controls, with completion handled separately. Actual end-to-end personal-video outputs remain unverified in this review.
 
 **Value being tested:** whether feedback in the context of the shared plan is understandable and helps users choose a useful next action. The current tests do not establish model accuracy, faster dog learning or professional readiness.
 

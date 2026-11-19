@@ -4,13 +4,13 @@ Due November 19, 2026. This round is the revised-prototype milestone. The final-
 
 ## Required before submission
 
-- [ ] Sync the latest revised Replit source and required assets to https://github.com/csavini2-eng/Current_State_AI. The November 7 public snapshot was still the earlier GoodBoy code.
+- [x] Sync revised Replit source and required assets to GitHub. Merge [2d870ae](https://github.com/csavini2-eng/Current_State_AI/commit/2d870aefc60a5500d9d99595788ffce12dedadfe) verified on `main` November 19; five submission documents and demo link were preserved by the merge.
 - [x] Add README links, revision documentation, AI-use disclosure, demo notes and checklist to the same repository.
 - [ ] Check all descriptions against the latest Replit source after syncing it.
-- [ ] Rerun relevant tests, type checks and build on the current synced source; record actual results. Earlier reports belong to earlier versions.
+- [x] Record current implementation checks: Replit reported type checks, 27 regression tests and frontend/API builds passing for the November 19 merge. These were not independently rerun in the documentation review; end-to-end checks below remain open.
 - [ ] Complete a personal practice-video upload, playback, feedback creation and save with sample data.
 - [ ] Open a handler link in a separate browser/device, submit a sample practice video and note, and confirm the trainer receives them. A second tab in the same browser does not fully test this.
-- [ ] Confirm whether personal-feedback behavior is deterministic prepared text, manual, rules-based, or model-generated. Update revision.md and ai-use-disclosure.md accurately.
+- [x] Confirm personal-feedback implementation by source inspection: deterministic rules use the selected milestone, handler description and outcome; no video analysis or live model. Disclosure updated November 19. Runtime end-to-end verification remains open.
 - [ ] Ask a trainer/handler or classmate to try the flow and explain the note. Record their actual interpretation, rather than only whether a button worked. This strengthens usefulness evidence; do not invent participant results.
 - [ ] Review the five-case table, historical before-and-after comparison, interpretation and concrete risk response.
 - [ ] Record source/permission and required attribution for bundled footage and imagery. Do not assume a watermark preview grants publication permission. Do not add the earlier Give paw preview unless it is actually used and permitted.
@@ -30,4 +30,4 @@ Give a tester no navigation instructions initially. Ask them to find the dog's n
 
 ## Status of this package
 
-These repository files are drafts based on the project conversation and assisted browser observations. The recorded demo is uploaded to Drive and linked from README. Current Replit source synchronization and the Canvas submission still need confirmation. Catherine should review the disclosure in her own words before submission.
+These repository files are drafts based on the project conversation and assisted browser observations. The recorded demo is uploaded to Drive and linked from README. Revised source/assets are now verified in GitHub. The remaining end-to-end checks and Canvas submission still need confirmation. Catherine should review the disclosure in her own words before submission.

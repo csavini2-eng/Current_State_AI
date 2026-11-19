@@ -2,7 +2,7 @@
 
 Weenstone helps trainers and handlers follow the same dog-specific training plan, record practice, and understand progress. It is designed for trainers coordinating with handlers of working or service dogs in training.
 
-**Submission status:** documentation and demo video link added. The latest Replit source/assets and remaining verification still need confirmation before submission.
+**Submission status:** revised source/assets, documentation and demo video link are in GitHub. Source synchronization was verified November 19, 2026. Remaining checks and Canvas submission are listed in the [checklist](submission-checklist.md).
 
 ## Try the prototype
 
@@ -20,7 +20,9 @@ The intended AI feature would help handlers review practice against the trainer'
 
 Prototype source is organized under `artifacts/goodboy-training`, backend source under `artifacts/api-server`, and shared packages under `lib`. Internal GoodBoy package and folder names may remain for compatibility.
 
-**Before submission: sync the revised Replit code and required assets into this repository.** The November 8 repository check still found the earlier GoodBoy implementation. The browser observations in these documents concern the live Replit app reviewed November 7, not the older source currently in this repository. Documentation alone does not resolve this mismatch.
+The revised Weenstone source and assets were merged into `main` on November 19, 2026 at [2d870ae](https://github.com/csavini2-eng/Current_State_AI/commit/2d870aefc60a5500d9d99595788ffce12dedadfe). Repository inspection confirmed the branding, Raya image, Sit clip, handler route, guest sharing and practice-submission code. The five existing submission documents and demo link were preserved unchanged by that merge.
+
+Replit reported passing type checks, 27 regression tests, and frontend/API builds for the merge; these checks were not independently rerun in this documentation review. The browser evaluation below remains dated November 7 and does not establish end-to-end behavior of every feature in the newer source. No publication or database migration was performed as part of the reported sync.
 
 ## Revision and evaluation
 
